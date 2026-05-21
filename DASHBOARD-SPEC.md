@@ -107,7 +107,7 @@ System font stack. Two weights: 400 (regular) and 500 (medium, used for headings
 
 ### Components
 
-**Growth statement callout** — sits between the sub-counts bar and the metric cards on every view. Two paragraphs in a secondary-background block: a benchmark sentence about Ignite students nationally (in secondary text), and a personalized sentence about the students in the current scope (in primary text). Placeholder figures (the national benchmark numbers and the months-of-progress value) are marked with a dotted underline, and a small footer note inside the callout explains the convention. The personalized sentence adapts to the scope:
+**Growth statement callout** — sits between the sub-counts bar and the metric cards on every view. Sits in a secondary-background block with generous padding. The personalized sentence is rendered at 18px in primary text so the headline stat reads as a hero. The national benchmark sentence (13px secondary text) appears **only on the district view**; the school and grade views drop it because the audience there is already inside their own scope. Placeholder figures (the national benchmark numbers and the months-of-progress value) are marked with a dotted underline, and a small footer note inside the callout explains the convention. The personalized sentence adapts to the scope:
 - District and school views: aggregated across 1st and 2nd graders only, citing words correct per minute and high-frequency words.
 - Grade view (K): scoped to kindergartners, citing phonological awareness (letter sounds) and letter naming fluency.
 - Grade view (1st / 2nd): scoped to that grade, same metrics as the district sentence.
