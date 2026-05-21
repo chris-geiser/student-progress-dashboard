@@ -117,7 +117,7 @@ The months-of-progress figure uses a proxy formula until a real definition lands
 **View title** — 18px, weight 500. District view shows district name, school view shows school name, grade view shows "[School Name] — [Grade Name]".
 
 **Counts subtitle bar** — 13px secondary text, light rules above and below, dot separators between items. Content varies by view level:
-- District: total students, school count, per-grade student counts
+- District: total students, per-grade student counts
 - School: total students, per-grade student counts
 - Grade: student count with grade plural label
 
@@ -158,8 +158,12 @@ Tabler Icons webfont (outline style only). Used for: back arrow (`ti-arrow-left`
 
 ### Responsive behavior
 
-Below 640px viewport width, the layout adapts:
+Below 767px viewport width:
+- The chart column in the student-level table is hidden so the row only carries the numeric fields. The Current column is right-aligned to compensate.
+
+Below 640px viewport width:
 - Summary metric cards stack into a single column (instead of the 3-column grid).
+- The per-grade/per-metric grid on district and school cards also stacks into a single column so the bars and triplets stay readable.
 - Metric toggle buttons in the grade view become a `<select>` dropdown. Both elements are always rendered; CSS shows one or the other based on viewport.
 - The student table wraps in a horizontal-scroll container with a 640px minimum width. The first column (Student) is sticky so the name stays visible while the rest of the row scrolls.
 - Body padding tightens from 2rem to 1rem to claim more usable width.
