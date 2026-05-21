@@ -1,6 +1,6 @@
 # Student Reading Progress Dashboard — Spec
 
-Reference implementation: `district-dashboard.html` (single self-contained HTML file, all CSS and JS inline).
+Reference implementation: `index.html` (single self-contained HTML file, all CSS and JS inline).
 
 This is a prototype dashboard for school administrators to track K-2 student reading progress across a district. It uses procedurally generated demo data. The goal is to validate the information architecture, visual design, and interaction model before building a production version.
 
@@ -167,14 +167,14 @@ Tabler Icons webfont (outline style only). Used for: back arrow (`ti-arrow-left`
 
 ## File structure
 
-Currently a single `district-dashboard.html` file. Everything is inline: CSS in a `<style>` block, JS in a `<script>` block, no external dependencies except Tabler Icons CDN.
+Currently a single `index.html` file (the district view). Everything is inline: CSS in a `<style>` block, JS in a `<script>` block, no external dependencies except Tabler Icons CDN.
 
 A separate `school-dashboard.html` exists from an earlier iteration (single-school view only). It is out of sync with the district dashboard and should not be used as a reference.
 
 ## Getting started
 
 1. Create a new GitHub repo (e.g., `student-progress-dashboard`) under the Ignite Reading org or Chris's personal account.
-2. Add `district-dashboard.html` and this spec to the repo root.
+2. Add `index.html` and this spec to the repo root.
 3. The prototype is a single self-contained HTML file. Open it directly in a browser to see the current state. No build step required.
 
 ## What's next (not yet built)
