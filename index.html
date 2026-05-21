@@ -64,7 +64,8 @@ body{font-family:var(--font-sans);margin:0;padding:2rem;color:var(--color-text-p
 .mm-name{font-size:12px;color:var(--color-text-secondary);margin-bottom:6px}
 .mm-bar-wrap{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .mm-bar-bg{flex:1;height:8px;background:var(--color-background-secondary);border-radius:4px;position:relative;overflow:visible}
-.mm-bar-fill{height:100%;border-radius:4px}
+.mm-bar-fill{position:absolute;top:0;height:100%;border-radius:4px}
+.mm-bs{position:absolute;top:0;width:8px;height:8px;border-radius:50%;background:var(--color-text-tertiary);transform:translateX(-50%);z-index:3}
 .mm-bench{position:absolute;top:-2px;height:12px;width:2px;border-radius:1px;background:var(--color-text-secondary)}
 .mm-val{font-size:13px;font-weight:500;white-space:nowrap;min-width:50px;text-align:right}
 .mm-val .t{color:var(--color-text-tertiary);font-weight:400}
@@ -92,10 +93,12 @@ tr:last-child td{border-bottom:none}
 .tn{color:var(--color-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bw{display:flex;align-items:center;gap:8px}
 .bb{flex:1;height:12px;background:var(--color-background-secondary);border-radius:6px;min-width:60px;overflow:visible;position:relative}
-.bf{position:absolute;top:0;left:0;height:100%;border-radius:6px;z-index:2}
-.bp{position:absolute;top:0;left:0;height:100%;border-radius:6px;z-index:1;overflow:hidden}
+.bf{position:absolute;top:0;height:100%;border-radius:6px;z-index:2}
+.bp{position:absolute;top:0;height:100%;z-index:1;overflow:hidden}
 .bp-i{width:100%;height:100%}
+.bs{position:absolute;top:1px;width:10px;height:10px;border-radius:50%;background:var(--color-text-tertiary);transform:translateX(-50%);z-index:3}
 .bl{position:absolute;top:-3px;height:18px;width:2px;z-index:3;border-radius:1px;background:var(--color-text-secondary)}
+.bv{text-align:right;color:var(--color-text-secondary)}
 .sv{min-width:30px;text-align:right;font-size:13px;font-weight:500;white-space:nowrap}
 .gv{font-size:13px;font-weight:500}
 .pos{color:#639922}.neg{color:#E24B4A}
@@ -254,8 +257,10 @@ h+='<div class="gc" onclick="navTo(\'school\','+i+')"><div class="gc-head"><div>
 sg.forEach(function(gk){
 var gn=GM[gk].name;var dmk=DMET[gk];var m=GM[gk].metrics[dmk];var s=gradeStats(i,gk,dmk);
 var avgPct=Math.min(100,Math.round(s.avg/m.mx*100));
+var avgBoy=s.avg-s.avgGr;var avgBoyPct=Math.max(0,Math.min(100,Math.round(avgBoy/m.mx*100)));
 var avgProj=proj(Math.round(s.avg*(MO/MT)),s.avg,m.cap);var col=sc(avgProj>=m.t?'on-track':'below');
-h+='<div class="mm"><div class="mm-name">'+gn+' average '+DMET_LABEL[gk]+'</div><div class="mm-bar-wrap"><div class="mm-bar-bg"><div class="mm-bar-fill" style="width:'+avgPct+'%;background:'+col+';border-radius:4px"></div>';
+h+='<div class="mm"><div class="mm-name">'+gn+' average '+DMET_LABEL[gk]+'</div><div class="mm-bar-wrap"><div class="mm-bar-bg"><div class="mm-bar-fill" style="left:'+avgBoyPct+'%;width:'+(avgPct-avgBoyPct)+'%;background:'+col+'"></div>';
+h+='<div class="mm-bs" style="left:'+avgBoyPct+'%"></div>';
 var tPct=Math.round(m.t/m.mx*100);h+='<div class="mm-bench" style="left:'+tPct+'%"></div>';
 h+='</div><div class="mm-val">'+s.avg+'<span class="t"> / '+m.t+'</span></div></div><div class="mm-stats">';
 h+='<div class="mm-stat"><b>+'+s.avgGr+'</b> average growth</div>';
@@ -285,7 +290,8 @@ h+='<div class="gc" onclick="navTo(\'grade\','+si+',\''+gk+'\')"><div class="gc-
 keys.forEach(function(mk){
 var m=g.metrics[mk];var s=gradeStats(si,gk,mk);
 var avgPct=Math.min(100,Math.round(s.avg/m.mx*100));var tPct=Math.round(m.t/m.mx*100);var avgP=proj(Math.round(s.avg*(MO/MT)),s.avg,m.cap);var col=sc(avgP>=m.t?'on-track':'below');
-h+='<div class="mm"><div class="mm-name">Average '+m.n.toLowerCase()+'</div><div class="mm-bar-wrap"><div class="mm-bar-bg"><div class="mm-bar-fill" style="width:'+avgPct+'%;background:'+col+';border-radius:4px"></div><div class="mm-bench" style="left:'+tPct+'%"></div></div><div class="mm-val">'+s.avg+'<span class="t"> / '+m.t+'</span></div></div><div class="mm-stats"><div class="mm-stat"><b>+'+s.avgGr+'</b> average growth</div><div class="mm-stat"><b>'+s.projPct+'%</b> projected to meet target</div></div></div>';
+var avgBoy=s.avg-s.avgGr;var avgBoyPct=Math.max(0,Math.min(100,Math.round(avgBoy/m.mx*100)));
+h+='<div class="mm"><div class="mm-name">Average '+m.n.toLowerCase()+'</div><div class="mm-bar-wrap"><div class="mm-bar-bg"><div class="mm-bar-fill" style="left:'+avgBoyPct+'%;width:'+(avgPct-avgBoyPct)+'%;background:'+col+'"></div><div class="mm-bs" style="left:'+avgBoyPct+'%"></div><div class="mm-bench" style="left:'+tPct+'%"></div></div><div class="mm-val">'+s.avg+'<span class="t"> / '+m.t+'</span></div></div><div class="mm-stats"><div class="mm-stat"><b>+'+s.avgGr+'</b> average growth</div><div class="mm-stat"><b>'+s.projPct+'%</b> projected to meet target</div></div></div>';
 });
 h+='</div></div>';
 });
@@ -319,8 +325,8 @@ if(hasTarget)h+='<div class="legend-item" style="margin-left:8px"><div class="ll
 h+='</div>';
 if(!m.key)h+='<div style="font-size:12px;color:var(--color-text-tertiary);margin-bottom:1rem;font-style:italic">Emerging measure for '+g.name+'. No formal EOY target.</div>';
 
-var cN=hasTarget?'14%':'18%',cT=hasTarget?'13%':'15%',cC=hasTarget?'30%':'38%',cG='10%',cP='14%',cD='14%';
-h+='<table><thead><tr><th style="width:'+cN+'" data-sort="name">Student <span class="sa">&#9650;</span></th><th style="width:'+cT+'" data-sort="teacher">Teacher <span class="sa">&#9650;</span></th><th style="width:'+cC+'" data-sort="current">Current <span class="sa">&#9650;</span></th><th style="width:'+cG+'" data-sort="growth">Growth <span class="sa">&#9650;</span></th>';
+var cN=hasTarget?'13%':'17%',cT=hasTarget?'11%':'13%',cS='8%',cC=hasTarget?'26%':'32%',cG='10%',cP='14%',cD='14%';
+h+='<table><thead><tr><th style="width:'+cN+'" data-sort="name">Student <span class="sa">&#9650;</span></th><th style="width:'+cT+'" data-sort="teacher">Teacher <span class="sa">&#9650;</span></th><th style="width:'+cS+';text-align:right" data-sort="boy">Start <span class="sa">&#9650;</span></th><th style="width:'+cC+'" data-sort="current">Current <span class="sa">&#9650;</span></th><th style="width:'+cG+'" data-sort="growth">Growth <span class="sa">&#9650;</span></th>';
 if(hasTarget)h+='<th style="width:'+cP+'" data-sort="projected">Projected EOY <span class="sa">&#9650;</span></th><th style="width:'+cD+'" data-sort="delta">vs. EOY target <span class="sa">&#9650;</span></th>';
 h+='</tr></thead><tbody id="tb"></tbody></table>';
 app.innerHTML=h;
@@ -334,13 +340,17 @@ data.sort(function(a,b){var va=a[st.sort],vb=b[st.sort];if(typeof va==='string')
 var tPct=hasTarget?Math.round(m.t/m.mx*100):0;
 var rows='';
 data.forEach(function(d){
+var bPct=Math.max(0,Math.min(100,Math.round(d.boy/m.mx*100)));
 var cPct=Math.min(100,Math.round(d.current/m.mx*100));
 var pPct=hasTarget?Math.min(100,Math.round(d.projected/m.mx*100)):0;
 var gSign=d.growth>=0?'+':'';var gCl=d.growth>=0?'pos':'neg';
 var bCol=sc(d.cs);
-rows+='<tr><td class="sn">'+d.name+'</td><td class="tn">'+d.teacher+'</td><td><div class="bw"><div class="bb">';
-if(hasTarget&&pPct>cPct)rows+='<div class="bp" style="width:'+pPct+'%"><div class="bp-i" style="background:'+slBg(bCol)+'"></div></div>';
-rows+='<div class="bf" style="width:'+cPct+'%;background:'+bCol+'"></div>';
+rows+='<tr><td class="sn">'+d.name+'</td><td class="tn">'+d.teacher+'</td>';
+rows+='<td class="bv">'+d.boy+'</td>';
+rows+='<td><div class="bw"><div class="bb">';
+if(hasTarget&&pPct>cPct)rows+='<div class="bp" style="left:'+cPct+'%;width:'+(pPct-cPct)+'%"><div class="bp-i" style="background:'+slBg(bCol)+'"></div></div>';
+rows+='<div class="bf" style="left:'+bPct+'%;width:'+(cPct-bPct)+'%;background:'+bCol+'"></div>';
+rows+='<div class="bs" style="left:'+bPct+'%"></div>';
 if(hasTarget)rows+='<div class="bl" style="left:'+tPct+'%"></div>';
 rows+='</div><div class="sv">'+d.current+'</div></div></td>';
 rows+='<td><span class="gv '+gCl+'">'+gSign+d.growth+'</span></td>';
