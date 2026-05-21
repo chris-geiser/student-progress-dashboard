@@ -304,10 +304,12 @@ return{avg:avg,avgGr:avgGr,projMet:projMet,projPct:projPct,total:all.length}}
 function schoolGrades(si){return GKS.filter(function(gk){return SCHOOLS[si].students[gk].length>0})}
 
 function schoolStats(si){
+// "Projected to meet target" uses one representative metric per grade
+// (DMET: PA for K, WCPM for 1st and 2nd) so each student is counted once.
 var total=0,pm=0,pt=0;
 schoolGrades(si).forEach(function(gk){
-var keys=Object.keys(GM[gk].metrics).filter(function(mk){return GM[gk].metrics[mk].key});
-keys.forEach(function(mk){var s=gradeStats(si,gk,mk);pm+=s.projMet;pt+=s.total});
+var s=gradeStats(si,gk,DMET[gk]);
+pm+=s.projMet;pt+=s.total;
 total+=SCHOOLS[si].students[gk].length;
 });
 return{total:total,projMet:pm,projTot:pt,projPct:pt?Math.round(pm/pt*100):0}}
