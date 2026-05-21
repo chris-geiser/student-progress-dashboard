@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>District Reading Progress Dashboard</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f5f4f0;
+  --color-background-tertiary: #fafaf8;
+  --color-background-info: #E6F1FB;
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #666663;
+  --color-text-tertiary: #999996;
+  --color-text-info: #185FA5;
+  --color-border-primary: rgba(0,0,0,0.4);
+  --color-border-secondary: rgba(0,0,0,0.3);
+  --color-border-tertiary: rgba(0,0,0,0.15);
+  --color-border-info: #85B7EB;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background-primary: #2c2c2a;
+    --color-background-secondary: #363633;
+    --color-background-tertiary: #2c2c2a;
+    --color-background-info: #0C447C;
+    --color-text-primary: #f0efe8;
+    --color-text-secondary: #a8a8a3;
+    --color-text-tertiary: #7a7a76;
+    --color-text-info: #85B7EB;
+    --color-border-primary: rgba(255,255,255,0.4);
+    --color-border-secondary: rgba(255,255,255,0.3);
+    --color-border-tertiary: rgba(255,255,255,0.15);
+    --color-border-info: #378ADD;
+  }
+}
+html{background:var(--color-background-tertiary)}
+body{font-family:var(--font-sans);margin:0;padding:2rem;color:var(--color-text-primary);max-width:780px;margin:0 auto}
+*{box-sizing:border-box;margin:0;padding:0}
+.dash{padding:0.5rem 0}
+.metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem}
+.mc{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:0.75rem 1rem}
+.mc-l{font-size:12px;color:var(--color-text-secondary);margin-bottom:4px}
+.mc-v{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.mc-s{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.back-btn{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--color-text-info);cursor:pointer;margin-bottom:1rem;background:none;border:none;font-family:var(--font-sans);padding:0}
+.back-btn:hover{text-decoration:underline}
+.view-title{font-size:18px;font-weight:500;color:var(--color-text-primary);margin-bottom:0}
+.sub-counts{font-size:13px;color:var(--color-text-secondary);padding:10px 0;margin-bottom:1.5rem;border-top:0.5px solid var(--color-border-tertiary);border-bottom:0.5px solid var(--color-border-tertiary);margin-top:8px}
+.sub-counts span+span::before{content:"·";margin:0 8px;color:var(--color-text-tertiary)}
+.gc{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:12px;cursor:pointer;transition:border-color 0.15s}
+.gc:hover{border-color:var(--color-border-secondary)}
+.gc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.gc-name{font-size:16px;font-weight:500;color:var(--color-text-primary)}
+.gc-count{font-size:13px;color:var(--color-text-secondary);margin-left:8px}
+.gc-arrow{font-size:18px;color:var(--color-text-tertiary)}
+.gc-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:24px 24px}
+.mm{padding:0}
+.mm-name{font-size:12px;color:var(--color-text-secondary);margin-bottom:6px}
+.mm-bar-wrap{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.mm-bar-bg{flex:1;height:8px;background:var(--color-background-secondary);border-radius:4px;position:relative;overflow:visible}
+.mm-bar-fill{height:100%;border-radius:4px}
+.mm-bench{position:absolute;top:-2px;height:12px;width:2px;border-radius:1px;background:var(--color-text-secondary)}
+.mm-val{font-size:13px;font-weight:500;white-space:nowrap;min-width:50px;text-align:right}
+.mm-val .t{color:var(--color-text-tertiary);font-weight:400}
+.mm-stats{display:flex;flex-direction:column;gap:2px}
+.mm-stat{font-size:12px;color:var(--color-text-secondary)}
+.mm-stat b{font-weight:500}
+.controls-row{display:flex;gap:8px;margin-bottom:1rem;align-items:center;flex-wrap:wrap}
+.tb{padding:6px 14px;font-size:13px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);cursor:pointer;font-family:var(--font-sans)}
+.tb.active{background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)}
+.fl{font-size:12px;color:var(--color-text-secondary);margin-left:auto}
+.controls-row select{font-size:13px;padding:5px 8px;font-family:var(--font-sans);margin-left:4px;background:var(--color-background-primary);color:var(--color-text-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md)}
+.legend{display:flex;gap:14px;margin-bottom:1rem;font-size:12px;color:var(--color-text-secondary);flex-wrap:wrap;align-items:center}
+.legend-item{display:flex;align-items:center;gap:5px}
+.ld{width:8px;height:8px;border-radius:2px}
+.ll{width:8px;height:2.5px;border-radius:1px}
+.ls{width:16px;height:10px;border-radius:2px;background:repeating-linear-gradient(45deg,#888780 0px,#888780 2px,transparent 2px,transparent 6px)}
+table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+th{text-align:left;padding:8px 10px;font-weight:500;font-size:12px;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);cursor:pointer;user-select:none;white-space:nowrap}
+th:hover{color:var(--color-text-primary)}
+th .sa{font-size:10px;margin-left:3px;opacity:0.4}
+th.sorted .sa{opacity:1}
+td{padding:7px 10px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.sn{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tn{color:var(--color-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bw{display:flex;align-items:center;gap:8px}
+.bb{flex:1;height:12px;background:var(--color-background-secondary);border-radius:6px;min-width:60px;overflow:visible;position:relative}
+.bf{position:absolute;top:0;left:0;height:100%;border-radius:6px;z-index:2}
+.bp{position:absolute;top:0;left:0;height:100%;border-radius:6px;z-index:1;overflow:hidden}
+.bp-i{width:100%;height:100%}
+.bl{position:absolute;top:-3px;height:18px;width:2px;z-index:3;border-radius:1px;background:var(--color-text-secondary)}
+.sv{min-width:30px;text-align:right;font-size:13px;font-weight:500;white-space:nowrap}
+.gv{font-size:13px;font-weight:500}
+.pos{color:#639922}.neg{color:#E24B4A}
+@media(prefers-color-scheme:dark){.pos{color:#97C459}.neg{color:#F09595}}
+.pc{font-size:13px;white-space:nowrap}
+.ps{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.dc{font-size:13px;font-weight:500}
+</style>
+</head>
+<body>
+<div class="dash" id="app"></div>
+<script>
+var MO=4,MT=10;
+var GM={
+k:{name:"Kindergarten",plural:"Kindergartners",metrics:{
+pa:{n:"Phonological awareness",t:35,b:14,mx:45,u:"correct sound segments",cap:null,key:1},
+lnf:{n:"Letter naming fluency",t:42,b:17,mx:55,u:"letters per minute",cap:null,key:1},
+wcpm:{n:"Words correct per minute",t:null,b:null,mx:15,u:"WCPM",cap:null,key:0},
+hfw:{n:"High-frequency words",t:null,b:null,mx:25,u:"high-frequency words",cap:null,key:0}}},
+g1:{name:"1st Grade",plural:"1st Graders",metrics:{
+wcpm:{n:"Words correct per minute",t:42,b:17,mx:58,u:"WCPM",cap:null,key:1},
+hfw:{n:"High-frequency words",t:200,b:80,mx:220,u:"high-frequency words",cap:200,key:1}}},
+g2:{name:"2nd Grade",plural:"2nd Graders",metrics:{
+wcpm:{n:"Words correct per minute",t:90,b:40,mx:110,u:"WCPM",cap:null,key:1},
+hfw:{n:"High-frequency words",t:200,b:120,mx:220,u:"high-frequency words",cap:200,key:1}}}
+};
+var GKS=['k','g1','g2'];
+
+function rng(seed){var s=seed;return function(){s|=0;s=s+0x6D2B79F5|0;var t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+var FN=["Ava","Ben","Chloe","Dylan","Emma","Finn","Grace","Hugo","Aiden","Bella","Carlos","Daisy","Ethan","Fatima","Gabi","Henry","Izzy","Jayden","Kayla","Liam","Maya","Noah","Olivia","Preston","Quinn","Rosa","Sam","Tiana","Alex","Brooklyn","Charlie","Diana","Eli","Freya","George","Mia","Lucas","Sophia","Leo","Zara","Aria","Owen","Luna","Jack","Nora","Theo","Ivy","Max","Lily","Ryan","Harper","Cole","Stella","Wyatt","Ruby","Asher","Hazel","Mila","Caleb","Violet","Elijah","Scarlett","Nathan","Amelia","Logan","Penny","Miles","Clara","Ezra","Willow","Isaiah","Autumn","Jude","Sienna","Kai","Margot","Ravi","Priya","Yuki","Kenji","Luca","Ines","Omar","Leila","Soren","Jasper","Iris","Felix","Ada","Rowan","Sage"];
+var LI=["A","B","C","D","E","F","G","H","J","K","L","M","N","P","R","S","T","V","W"];
+var TN=["Ms. Rivera","Mr. Chen","Ms. Okafor","Mr. Patel","Ms. Lindgren","Mr. Davis","Ms. Tanaka","Mr. Kowalski","Ms. Hernandez","Mr. Brooks","Ms. Nguyen","Mr. Sullivan","Ms. Adeyemi","Mr. Frost","Ms. Kaplan","Mr. Reeves","Ms. Lombardi","Mr. Shah"];
+
+var BOY_R={
+k:{pa:[1,8],lnf:[2,12]},
+g1:{wcpm:[3,15],hfw:[8,38]},
+g2:{wcpm:[20,45],hfw:[60,120]}
+};
+
+function genStudents(r,n,gk){
+var mks=Object.keys(GM[gk].metrics);
+var nTeachers=Math.max(1,Math.ceil(n/20));
+var teachers=[];var usedT={};
+for(var ti=0;ti<nTeachers;ti++){var tn;do{tn=TN[Math.floor(r()*TN.length)]}while(usedT[tn]);usedT[tn]=true;teachers.push(tn)}
+var used={};var students=[];
+for(var i=0;i<n;i++){
+var nm;do{nm=FN[Math.floor(r()*FN.length)]+' '+LI[Math.floor(r()*LI.length)]+'.';}while(used[nm]);
+used[nm]=true;
+var s={name:nm,teacher:teachers[i%nTeachers]};
+mks.forEach(function(mk){
+var met=GM[gk].metrics[mk];
+if(met.t===null){s[mk]={b:0,c:Math.floor(r()*(met.mx+1))};return}
+var br=BOY_R[gk][mk];
+var boy=Math.round(br[0]+r()*(br[1]-br[0]));
+var thr=boy+(met.t-boy)*0.4;
+var cur;
+if(r()<0.68){
+var hi=met.cap?Math.min(met.cap,met.t*0.85):met.t*0.85;
+cur=Math.round(thr+r()*Math.max(hi-thr,3));
+}else{
+cur=Math.round(boy+1+r()*Math.max(thr-boy-2,1));
+}
+if(met.cap)cur=Math.min(cur,met.cap);
+cur=Math.max(boy+1,cur);
+s[mk]={b:boy,c:cur};
+});
+students.push(s);
+}
+return students;
+}
+
+var DISTRICT_NAME="Riverside Unified School District";
+var DMET={k:'pa',g1:'wcpm',g2:'wcpm'};
+var DMET_LABEL={k:'PA',g1:'WCPM',g2:'WCPM'};
+
+var SCFG=[
+{name:"Lincoln Elementary",seed:42,k:8,g1:20,g2:7,seats:0},
+{name:"Washington Elementary",seed:137,k:12,g1:28,g2:15,seats:3},
+{name:"Jefferson Elementary",seed:256,k:0,g1:22,g2:10,seats:0},
+{name:"Roosevelt Elementary",seed:389,k:6,g1:15,g2:0,seats:2},
+{name:"Madison Elementary",seed:512,k:11,g1:25,g2:12,seats:0},
+{name:"Adams Elementary",seed:731,k:0,g1:20,g2:0,seats:1}
+];
+
+var SCHOOLS=SCFG.map(function(cfg){
+var r=rng(cfg.seed);
+return{name:cfg.name,seats:cfg.seats,students:{
+k:cfg.k>0?genStudents(r,cfg.k,'k'):[],
+g1:cfg.g1>0?genStudents(r,cfg.g1,'g1'):[],
+g2:cfg.g2>0?genStudents(r,cfg.g2,'g2'):[]}};
+});
+
+var st={view:'district',si:null,gk:null,gm:{},sort:'name',asc:true,filter:'all'};
+SCHOOLS.forEach(function(s,i){st.gm[i]={k:'pa',g1:'wcpm',g2:'wcpm'};});
+
+function sc(s){return s==='on-track'?'#639922':'#E24B4A'}
+function proj(boy,cur,cap){var r=(cur-boy)/MO;var p=Math.round(boy+r*MT);if(cap!==null)p=Math.min(p,cap);return p}
+function slBg(c){return'repeating-linear-gradient(45deg,'+c+' 0px,'+c+' 2px,transparent 2px,transparent 6px)'}
+
+function gsd(student,gk,mk){
+var m=GM[gk].metrics[mk];var d=student[mk];if(!d)return null;
+var cur=m.cap!==null?Math.min(d.c,m.cap):d.c;var gr=cur-d.b;
+var pr=m.t!==null?proj(d.b,cur,m.cap):null;
+var s2=m.t!==null?(pr>=m.t?'on-track':'below'):'on-track';
+var dl=m.t!==null?pr-m.t:null;
+return{name:student.name,teacher:student.teacher,current:cur,boy:d.b,growth:gr,projected:pr,cs:s2,ps:s2,delta:dl}}
+
+function gradeStats(si,gk,mk){
+var m=GM[gk].metrics[mk];var students=SCHOOLS[si].students[gk];
+var all=students.map(function(s){return gsd(s,gk,mk)}).filter(Boolean);
+if(!all.length)return{avg:0,avgGr:0,projMet:0,projPct:0,total:0};
+var avg=Math.round(all.reduce(function(a,d){return a+d.current},0)/all.length);
+var avgGr=Math.round(all.reduce(function(a,d){return a+d.growth},0)/all.length);
+var projMet=m.t!==null?all.filter(function(d){return d.projected>=m.t}).length:0;
+var projPct=m.t!==null?Math.round(projMet/all.length*100):0;
+return{avg:avg,avgGr:avgGr,projMet:projMet,projPct:projPct,total:all.length}}
+
+function schoolGrades(si){return GKS.filter(function(gk){return SCHOOLS[si].students[gk].length>0})}
+
+function schoolStats(si){
+var total=0,pm=0,pt=0;
+schoolGrades(si).forEach(function(gk){
+var keys=Object.keys(GM[gk].metrics).filter(function(mk){return GM[gk].metrics[mk].key});
+keys.forEach(function(mk){var s=gradeStats(si,gk,mk);pm+=s.projMet;pt+=s.total});
+total+=SCHOOLS[si].students[gk].length;
+});
+return{total:total,projMet:pm,projTot:pt,projPct:pt?Math.round(pm/pt*100):0}}
+
+function gradeOverallStats(si,gk){
+var keys=Object.keys(GM[gk].metrics).filter(function(mk){return GM[gk].metrics[mk].key});
+var pm=0,pt=0,tgr=0,gc=0;
+keys.forEach(function(mk){
+var s=gradeStats(si,gk,mk);pm+=s.projMet;pt+=s.total;tgr+=s.avgGr;gc++;
+});
+return{projPct:pt?Math.round(pm/pt*100):0,avgGr:gc?Math.round(tgr/gc):0}}
+
+function renderDistrict(){
+var app=document.getElementById('app');
+var total=0,allPm=0,allPt=0,totalSeats=0;
+SCHOOLS.forEach(function(sch,i){
+var ss=schoolStats(i);total+=ss.total;allPm+=ss.projMet;allPt+=ss.projTot;totalSeats+=sch.seats;
+});
+var pct=allPt?Math.round(allPm/allPt*100):0;
+var gTotals={k:0,g1:0,g2:0};SCHOOLS.forEach(function(sch){GKS.forEach(function(gk){gTotals[gk]+=sch.students[gk].length})});
+var h='<div class="view-title">'+DISTRICT_NAME+'</div><div class="sub-counts"><span>'+total+' students</span><span>'+SCHOOLS.length+' schools</span>';
+GKS.forEach(function(gk){if(gTotals[gk]>0)h+='<span>'+gTotals[gk]+' '+GM[gk].plural+'</span>'});
+h+='</div><div class="metrics-row"><div class="mc"><div class="mc-l">Total students</div><div class="mc-v">'+total+'</div><div class="mc-s">across '+SCHOOLS.length+' schools</div></div>';
+h+='<div class="mc"><div class="mc-l">Projected to meet target</div><div class="mc-v">'+pct+'%</div><div class="mc-s">'+allPm+' of '+total+' students</div></div>';
+h+='<div class="mc"><div class="mc-l">Open seats</div><div class="mc-v">'+totalSeats+'</div><div class="mc-s">across '+SCHOOLS.filter(function(s){return s.seats>0}).length+' school'+(SCHOOLS.filter(function(s){return s.seats>0}).length!==1?'s':'')+'</div></div></div>';
+
+SCHOOLS.forEach(function(sch,i){
+var ss=schoolStats(i);
+var sg=schoolGrades(i);
+h+='<div class="gc" onclick="navTo(\'school\','+i+')"><div class="gc-head"><div><span class="gc-name">'+sch.name+'</span><span class="gc-count">'+ss.total+' students</span></div><i class="ti ti-chevron-right gc-arrow" aria-hidden="true"></i></div><div class="gc-metrics">';
+sg.forEach(function(gk){
+var gn=GM[gk].name;var dmk=DMET[gk];var m=GM[gk].metrics[dmk];var s=gradeStats(i,gk,dmk);
+var avgPct=Math.min(100,Math.round(s.avg/m.mx*100));
+var avgProj=proj(Math.round(s.avg*(MO/MT)),s.avg,m.cap);var col=sc(avgProj>=m.t?'on-track':'below');
+h+='<div class="mm"><div class="mm-name">'+gn+' average '+DMET_LABEL[gk]+'</div><div class="mm-bar-wrap"><div class="mm-bar-bg"><div class="mm-bar-fill" style="width:'+avgPct+'%;background:'+col+';border-radius:4px"></div>';
+var tPct=Math.round(m.t/m.mx*100);h+='<div class="mm-bench" style="left:'+tPct+'%"></div>';
+h+='</div><div class="mm-val">'+s.avg+'<span class="t"> / '+m.t+'</span></div></div><div class="mm-stats">';
+h+='<div class="mm-stat"><b>+'+s.avgGr+'</b> average growth</div>';
+h+='<div class="mm-stat"><b>'+s.projPct+'%</b> projected to meet target</div>';
+h+='</div></div>';
+});
+h+='</div></div>';
+});
+app.innerHTML=h}
+
+function renderSchool(si){
+var app=document.getElementById('app');
+var sch=SCHOOLS[si];var ss=schoolStats(si);
+var h='<button class="back-btn" onclick="navTo(\'district\')"><i class="ti ti-arrow-left" style="font-size:14px" aria-hidden="true"></i> '+DISTRICT_NAME+'</button>';
+h+='<div class="view-title">'+sch.name+'</div>';
+var sg=schoolGrades(si);
+h+='<div class="sub-counts"><span>'+ss.total+' students</span>';
+sg.forEach(function(gk){h+='<span>'+sch.students[gk].length+' '+GM[gk].plural+'</span>'});
+h+='</div>';
+h+='<div class="metrics-row"><div class="mc"><div class="mc-l">Total students</div><div class="mc-v">'+ss.total+'</div><div class="mc-s">across '+sg.length+' grade level'+(sg.length!==1?'s':'')+'</div></div>';
+h+='<div class="mc"><div class="mc-l">Projected to meet target</div><div class="mc-v">'+ss.projPct+'%</div><div class="mc-s">'+ss.projMet+' of '+ss.total+' students</div></div>';
+h+='<div class="mc"><div class="mc-l">Open seats</div><div class="mc-v">'+sch.seats+'</div><div class="mc-s">'+(sch.seats===0?'all seats filled':sch.seats+' available')+'</div></div></div>';
+
+sg.forEach(function(gk){
+var g=GM[gk];var keys=Object.keys(g.metrics).filter(function(mk){return g.metrics[mk].key});
+h+='<div class="gc" onclick="navTo(\'grade\','+si+',\''+gk+'\')"><div class="gc-head"><div><span class="gc-name">'+g.name+'</span><span class="gc-count">'+sch.students[gk].length+' students</span></div><i class="ti ti-chevron-right gc-arrow" aria-hidden="true"></i></div><div class="gc-metrics">';
+keys.forEach(function(mk){
+var m=g.metrics[mk];var s=gradeStats(si,gk,mk);
+var avgPct=Math.min(100,Math.round(s.avg/m.mx*100));var tPct=Math.round(m.t/m.mx*100);var avgP=proj(Math.round(s.avg*(MO/MT)),s.avg,m.cap);var col=sc(avgP>=m.t?'on-track':'below');
+h+='<div class="mm"><div class="mm-name">Average '+m.n.toLowerCase()+'</div><div class="mm-bar-wrap"><div class="mm-bar-bg"><div class="mm-bar-fill" style="width:'+avgPct+'%;background:'+col+';border-radius:4px"></div><div class="mm-bench" style="left:'+tPct+'%"></div></div><div class="mm-val">'+s.avg+'<span class="t"> / '+m.t+'</span></div></div><div class="mm-stats"><div class="mm-stat"><b>+'+s.avgGr+'</b> average growth</div><div class="mm-stat"><b>'+s.projPct+'%</b> projected to meet target</div></div></div>';
+});
+h+='</div></div>';
+});
+app.innerHTML=h}
+
+function renderGrade(si,gk){
+var app=document.getElementById('app');
+var sch=SCHOOLS[si];var g=GM[gk];var mk=st.gm[si][gk];var m=g.metrics[mk];var hasTarget=m.t!==null;
+var keys=Object.keys(g.metrics);
+var data=sch.students[gk].map(function(s){return gsd(s,gk,mk)}).filter(Boolean);
+var avg=data.length?Math.round(data.reduce(function(a,d){return a+d.current},0)/data.length):0;
+var avgGr=data.length?Math.round(data.reduce(function(a,d){return a+d.growth},0)/data.length):0;
+var projMet=hasTarget?data.filter(function(d){return d.projected>=m.t}).length:0;
+var projPct=hasTarget&&data.length?Math.round(projMet/data.length*100):0;
+
+var h='<button class="back-btn" onclick="navTo(\'school\','+si+')"><i class="ti ti-arrow-left" style="font-size:14px" aria-hidden="true"></i> '+sch.name+'</button>';
+h+='<div class="view-title">'+sch.name+' — '+g.name+'</div>';
+h+='<div class="sub-counts"><span>'+data.length+' '+g.plural+'</span></div>';
+h+='<div class="metrics-row"><div class="mc"><div class="mc-l">Class average</div><div class="mc-v">'+avg+(hasTarget?'<span style="font-size:13px;font-weight:400;color:var(--color-text-tertiary)">/'+m.b+'</span>':'')+'</div><div class="mc-s">'+m.u+(hasTarget?' vs. target':'')+'</div></div>';
+h+='<div class="mc"><div class="mc-l">Average growth (BOY to now)</div><div class="mc-v">+'+avgGr+'</div><div class="mc-s">'+m.u+'</div></div>';
+if(hasTarget){h+='<div class="mc"><div class="mc-l">Projected to meet target</div><div class="mc-v">'+projPct+'%</div><div class="mc-s">'+projMet+' of '+data.length+' students</div></div>'}
+else{h+='<div class="mc"><div class="mc-l">Students with growth</div><div class="mc-v">'+data.filter(function(d){return d.growth>0}).length+'</div><div class="mc-s">of '+data.length+' students</div></div>'}
+h+='</div>';
+
+h+='<div class="controls-row">';
+keys.forEach(function(k){var mi=g.metrics[k];h+='<button class="tb'+(k===mk?' active':'')+'" data-mk="'+k+'" data-si="'+si+'" data-gk="'+gk+'">'+mi.n+'</button>'});
+h+='</div>';
+
+h+='<div class="legend"><div class="legend-item"><div class="ld" style="background:#639922"></div> On track</div><div class="legend-item"><div class="ld" style="background:#E24B4A"></div> Below target</div>';
+if(hasTarget)h+='<div class="legend-item" style="margin-left:8px"><div class="ll" style="background:var(--color-text-secondary)"></div> EOY target</div><div class="legend-item"><div class="ls"></div> Projected growth</div>';
+h+='</div>';
+if(!m.key)h+='<div style="font-size:12px;color:var(--color-text-tertiary);margin-bottom:1rem;font-style:italic">Emerging measure for '+g.name+'. No formal EOY target.</div>';
+
+var cN=hasTarget?'14%':'18%',cT=hasTarget?'13%':'15%',cC=hasTarget?'30%':'38%',cG='10%',cP='14%',cD='14%';
+h+='<table><thead><tr><th style="width:'+cN+'" data-sort="name">Student <span class="sa">&#9650;</span></th><th style="width:'+cT+'" data-sort="teacher">Teacher <span class="sa">&#9650;</span></th><th style="width:'+cC+'" data-sort="current">Current <span class="sa">&#9650;</span></th><th style="width:'+cG+'" data-sort="growth">Growth <span class="sa">&#9650;</span></th>';
+if(hasTarget)h+='<th style="width:'+cP+'" data-sort="projected">Projected EOY <span class="sa">&#9650;</span></th><th style="width:'+cD+'" data-sort="delta">vs. EOY target <span class="sa">&#9650;</span></th>';
+h+='</tr></thead><tbody id="tb"></tbody></table>';
+app.innerHTML=h;
+bindGradeEvents(si,gk);
+renderRows(si,gk)}
+
+function renderRows(si,gk){
+var mk=st.gm[si][gk];var m=GM[gk].metrics[mk];var hasTarget=m.t!==null;
+var data=SCHOOLS[si].students[gk].map(function(s){return gsd(s,gk,mk)}).filter(Boolean);
+data.sort(function(a,b){var va=a[st.sort],vb=b[st.sort];if(typeof va==='string'){va=va.toLowerCase();vb=vb.toLowerCase()}if(va<vb)return st.asc?-1:1;if(va>vb)return st.asc?1:-1;return 0});
+var tPct=hasTarget?Math.round(m.t/m.mx*100):0;
+var rows='';
+data.forEach(function(d){
+var cPct=Math.min(100,Math.round(d.current/m.mx*100));
+var pPct=hasTarget?Math.min(100,Math.round(d.projected/m.mx*100)):0;
+var gSign=d.growth>=0?'+':'';var gCl=d.growth>=0?'pos':'neg';
+var bCol=sc(d.cs);
+rows+='<tr><td class="sn">'+d.name+'</td><td class="tn">'+d.teacher+'</td><td><div class="bw"><div class="bb">';
+if(hasTarget&&pPct>cPct)rows+='<div class="bp" style="width:'+pPct+'%"><div class="bp-i" style="background:'+slBg(bCol)+'"></div></div>';
+rows+='<div class="bf" style="width:'+cPct+'%;background:'+bCol+'"></div>';
+if(hasTarget)rows+='<div class="bl" style="left:'+tPct+'%"></div>';
+rows+='</div><div class="sv">'+d.current+'</div></div></td>';
+rows+='<td><span class="gv '+gCl+'">'+gSign+d.growth+'</span></td>';
+if(hasTarget){var pCol=sc(d.ps);var dSign=d.delta>=0?'+':'';var dCl=d.delta>=0?'pos':'neg';
+rows+='<td class="pc"><span class="ps" style="background:'+pCol+'"></span>'+d.projected+'</td>';
+rows+='<td class="dc '+dCl+'">'+dSign+d.delta+'</td>'}
+rows+='</tr>'});
+document.getElementById('tb').innerHTML=rows;
+document.querySelectorAll('th').forEach(function(th){th.classList.toggle('sorted',th.dataset.sort===st.sort);var a=th.querySelector('.sa');if(a)a.innerHTML=(th.dataset.sort===st.sort&&!st.asc)?'&#9660;':'&#9650;'})}
+
+function bindGradeEvents(si,gk){
+document.querySelectorAll('.tb').forEach(function(btn){btn.addEventListener('click',function(){st.gm[si][gk]=btn.dataset.mk;st.sort='name';st.asc=true;st.filter='all';renderGrade(si,gk)})});
+document.querySelectorAll('th[data-sort]').forEach(function(th){th.addEventListener('click',function(){var col=th.dataset.sort;if(st.sort===col)st.asc=!st.asc;else{st.sort=col;st.asc=true}renderRows(si,gk)})})}
+
+window.navTo=function(view,si,gk){
+st.view=view;st.si=si!==undefined?si:null;st.gk=gk||null;st.sort='name';st.asc=true;st.filter='all';render()};
+
+function render(){
+if(st.view==='district')renderDistrict();
+else if(st.view==='school')renderSchool(st.si);
+else renderGrade(st.si,st.gk);
+}
+render();
+</script>
+</body>
+</html>
