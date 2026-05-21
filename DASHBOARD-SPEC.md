@@ -118,7 +118,7 @@ System font stack. Two weights: 400 (regular) and 500 (medium, used for headings
 
 **School/grade cards** — white background, 0.5px tertiary border, 12px border radius. Clickable with hover state (border darkens). Header has name + student count on left, chevron-right icon on right.
 
-**Metric summary bars** (on cards) — 2-column grid layout. Each metric shows: 12px label, 8px tall bar with status-colored fill from average BOY to average current position, an 8px gray start dot at the average BOY position, a 2px tall benchmark tick mark at the target position, value/target text, and two stats lines (average growth, % projected to meet target).
+**Metric summary bars** (on cards) — 2-column grid layout. Each metric shows: 12px label, 8px tall bar with status-colored fill from average BOY to average current position, a 10px white start dot with a 2px status-colored stroke at the average BOY position, a 2px tall benchmark tick mark at the target position, value/target text, and two stats lines (average growth, % projected to meet target).
 
 **Student table** (grade view only) — fixed table layout. Sortable columns with arrow indicators. Columns:
 - Student (name, weight 500, truncates with ellipsis)
@@ -133,7 +133,7 @@ Column widths adjust based on whether the metric has a target (6 or 7 columns).
 
 **Inline bar charts** (in student table) — 12px tall, rounded. Layers:
 1. Track: light gray background spanning the full bar
-2. Start marker: 10px gray dot at the BOY (beginning-of-year) position
+2. Start marker: 12px white circle with a 2px status-colored stroke at the BOY (beginning-of-year) position
 3. Current progress: solid fill in the status color, extending from BOY to current position
 4. Projected growth zone: diagonal slash pattern (45deg repeating gradient, 2px stripes at 6px intervals) in the status color, extending from current to projected position
 5. Target marker: 2px wide, 18px tall tick mark at the target percentage
