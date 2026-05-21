@@ -107,7 +107,7 @@ System font stack. Two weights: 400 (regular) and 500 (medium, used for headings
 
 ### Components
 
-**Growth statement callout** — sits between the sub-counts bar and the metric cards on every view. Sits in a secondary-background block with generous padding. The personalized sentence is rendered at 18px in primary text so the headline stat reads as a hero. The national benchmark sentence (13px secondary text) appears **only on the district view**; the school and grade views drop it because the audience there is already inside their own scope. Key figures in both sentences are bolded (weight 500). The personalized sentence adapts to the scope:
+**Growth statement callout** — sits between the sub-counts bar and the metric cards on every view. Sits in a secondary-background block with generous padding. A single personalized sentence rendered at 18px in primary text so the headline stat reads as a hero. Key growth figures inside the sentence (months of progress, per-metric deltas) are rendered larger (24px, weight 500) in the info-blue accent color so they pop against the body text. The personalized sentence adapts to the scope:
 - District and school views: aggregated across 1st and 2nd graders only, citing words correct per minute and high-frequency words.
 - Grade view (K): scoped to kindergartners, citing phonological awareness (letter sounds) and letter naming fluency.
 - Grade view (1st / 2nd): scoped to that grade, same metrics as the district sentence.
