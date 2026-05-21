@@ -103,11 +103,11 @@ Max width: 780px, centered.
 
 ### Typography
 
-System font stack. Two weights: 400 (regular) and 500 (medium, used for headings, names, values). No bold (600/700).
+System font stack. Two weights for the body of the design system: 400 (regular) and 500 (medium, used for headings, names, values). The growth-statement callout is a deliberate exception that uses 700 for the hero metrics — see the Components section.
 
 ### Components
 
-**Growth statement callout** — sits between the sub-counts bar and the metric cards on every view. Sits in a secondary-background block with generous padding. A single personalized sentence rendered at 18px in primary text so the headline stat reads as a hero. Key growth figures inside the sentence (months of progress, per-metric deltas) are rendered larger (24px, weight 500) in the info-blue accent color so they pop against the body text. The personalized sentence adapts to the scope:
+**Growth statement callout** — sits between the sub-counts bar and the metric cards on every view. Sits in a secondary-background block with generous padding. A single personalized sentence rendered at 18px in primary text with a fixed 36px line-height so every wrapped line takes the same vertical space regardless of whether a 24px bold chunk sits on it. Key growth figures inside the sentence (months of progress, per-metric deltas) are rendered at 24px in weight 700 and the on-track green so they pop as the page's hero stat. (This is the one exception to the "no 600/700 weight" rule in the Typography section, made deliberately for the headline.) The personalized sentence adapts to the scope:
 - District and school views: aggregated across 1st and 2nd graders only, citing words correct per minute and high-frequency words.
 - Grade view (K): scoped to kindergartners, citing phonological awareness (letter sounds) and letter naming fluency.
 - Grade view (1st / 2nd): scoped to that grade, same metrics as the district sentence.
