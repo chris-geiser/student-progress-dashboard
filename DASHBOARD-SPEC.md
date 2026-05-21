@@ -107,6 +107,13 @@ System font stack. Two weights: 400 (regular) and 500 (medium, used for headings
 
 ### Components
 
+**Growth statement callout** — sits between the sub-counts bar and the metric cards on every view. Two paragraphs in a secondary-background block: a benchmark sentence about Ignite students nationally (in secondary text), and a personalized sentence about the students in the current scope (in primary text). Placeholder figures (the national benchmark numbers and the months-of-progress value) are marked with a dotted underline, and a small footer note inside the callout explains the convention. The personalized sentence adapts to the scope:
+- District and school views: aggregated across 1st and 2nd graders only, citing words correct per minute and high-frequency words.
+- Grade view (K): scoped to kindergartners, citing phonological awareness (letter sounds) and letter naming fluency.
+- Grade view (1st / 2nd): scoped to that grade, same metrics as the district sentence.
+
+The months-of-progress figure uses a proxy formula until a real definition lands: per student, `(current − BOY) / (target − BOY) × total_school_months`, capped at total months, then averaged across all students and metrics in scope. The benchmark percentage and benchmark months are hard-coded placeholders.
+
 **View title** — 18px, weight 500. District view shows district name, school view shows school name, grade view shows "[School Name] — [Grade Name]".
 
 **Counts subtitle bar** — 13px secondary text, light rules above and below, dot separators between items. Content varies by view level:
@@ -124,12 +131,13 @@ System font stack. Two weights: 400 (regular) and 500 (medium, used for headings
 - Student (name, weight 500, truncates with ellipsis)
 - Teacher (secondary color, truncates with ellipsis)
 - Start (BOY score, secondary color, right-aligned, sortable)
-- Current (inline bar chart from BOY to current + numeric value)
+- Current (current score, primary color, right-aligned, sortable)
+- Chart (inline bar chart from BOY to current, no header label, not sortable)
 - Growth (signed, green positive / red negative)
 - Projected EOY (colored dot + value, only if metric has target)
 - vs. EOY target (signed delta, only if metric has target)
 
-Column widths adjust based on whether the metric has a target (6 or 7 columns).
+The numeric Current value sits to the right of Start so the two reference numbers are adjacent, and the chart sits to the right of Current. Column widths adjust based on whether the metric has a target (7 or 8 columns).
 
 **Inline bar charts** (in student table) — 12px tall, rounded. Layers:
 1. Track: light gray background spanning the full bar
