@@ -104,6 +104,7 @@ tr:last-child td{border-bottom:none}
 .bl{position:absolute;top:-3px;height:18px;width:2px;z-index:3;border-radius:1px;background:var(--color-text-secondary)}
 .bv{text-align:right;color:var(--color-text-secondary)}
 .cv{text-align:right;font-weight:500}
+.mastered-cell{text-align:left;color:var(--color-text-secondary);font-style:italic;padding-left:24px}
 .sv{min-width:30px;text-align:right;font-size:13px;font-weight:500;white-space:nowrap}
 .tw{margin-bottom:0.5rem}
 @media (max-width:767px){
@@ -145,16 +146,20 @@ tr:last-child td{border-bottom:none}
 var MO=4,MT=10;
 var GM={
 k:{name:"Kindergarten",plural:"Kindergartners",metrics:{
-pa:{n:"Phonological awareness",t:35,b:14,mx:45,u:"correct sound segments",cap:null,key:1},
-lnf:{n:"Letter naming fluency",t:42,b:17,mx:55,u:"letters per minute",cap:null,key:1},
-wcpm:{n:"Words correct per minute",t:null,b:null,mx:15,u:"WCPM",cap:null,key:0},
-hfw:{n:"High-frequency words",t:null,b:null,mx:25,u:"high-frequency words",cap:null,key:0}}},
+wcpm:{n:"Words correct per minute",t:10,b:2,mx:15,u:"WCPM",cap:null,key:1},
+hfw:{n:"High-frequency words",t:20,b:5,mx:25,u:"high-frequency words",cap:null,key:1},
+pa:{n:"Phonological awareness",t:35,b:14,mx:45,u:"correct sound segments",cap:null,key:0},
+lnf:{n:"Letter naming fluency",t:42,b:17,mx:55,u:"letters per minute",cap:null,key:0}}},
 g1:{name:"1st Grade",plural:"1st Graders",metrics:{
 wcpm:{n:"Words correct per minute",t:42,b:17,mx:58,u:"WCPM",cap:null,key:1},
-hfw:{n:"High-frequency words",t:200,b:80,mx:220,u:"high-frequency words",cap:200,key:1}}},
+hfw:{n:"High-frequency words",t:200,b:80,mx:220,u:"high-frequency words",cap:200,key:1},
+pa:{n:"Phonological awareness",t:35,b:14,mx:45,u:"correct sound segments",cap:null,key:0},
+lnf:{n:"Letter naming fluency",t:42,b:17,mx:55,u:"letters per minute",cap:null,key:0}}},
 g2:{name:"2nd Grade",plural:"2nd Graders",metrics:{
 wcpm:{n:"Words correct per minute",t:90,b:40,mx:110,u:"WCPM",cap:null,key:1},
-hfw:{n:"High-frequency words",t:200,b:120,mx:220,u:"high-frequency words",cap:200,key:1}}}
+hfw:{n:"High-frequency words",t:200,b:120,mx:220,u:"high-frequency words",cap:200,key:1},
+pa:{n:"Phonological awareness",t:35,b:14,mx:45,u:"correct sound segments",cap:null,key:0},
+lnf:{n:"Letter naming fluency",t:42,b:17,mx:55,u:"letters per minute",cap:null,key:0}}}
 };
 var GKS=['k','g1','g2'];
 
@@ -165,9 +170,9 @@ var LI=["A","B","C","D","E","F","G","H","J","K","L","M","N","P","R","S","T","V",
 var TN=["Ms. Rivera","Mr. Chen","Ms. Okafor","Mr. Patel","Ms. Lindgren","Mr. Davis","Ms. Tanaka","Mr. Kowalski","Ms. Hernandez","Mr. Brooks","Ms. Nguyen","Mr. Sullivan","Ms. Adeyemi","Mr. Frost","Ms. Kaplan","Mr. Reeves","Ms. Lombardi","Mr. Shah"];
 
 var BOY_R={
-k:{pa:[1,8],lnf:[2,12]},
-g1:{wcpm:[3,15],hfw:[8,38]},
-g2:{wcpm:[20,45],hfw:[60,120]}
+k:{wcpm:[0,2],hfw:[0,5],pa:[1,8],lnf:[2,12]},
+g1:{wcpm:[3,15],hfw:[8,38],pa:[30,45],lnf:[35,50]},
+g2:{wcpm:[20,45],hfw:[60,120],pa:[38,45],lnf:[42,50]}
 };
 
 function genStudents(r,n,gk){
@@ -185,6 +190,8 @@ var met=GM[gk].metrics[mk];
 if(met.t===null){s[mk]={b:0,c:Math.floor(r()*(met.mx+1))};return}
 var br=BOY_R[gk][mk];
 var boy=Math.round(br[0]+r()*(br[1]-br[0]));
+// Mastered: BOY already at or above the EOY target. No further growth tracked.
+if(boy>=met.t){s[mk]={b:boy,c:boy,mastered:true};return}
 var thr=boy+(met.t-boy)*0.4;
 var cur;
 if(r()<0.68){
@@ -203,8 +210,8 @@ return students;
 }
 
 var DISTRICT_NAME="Riverside Unified School District";
-var DMET={k:'pa',g1:'wcpm',g2:'wcpm'};
-var DMET_LABEL={k:'PA',g1:'WCPM',g2:'WCPM'};
+var DMET={k:'wcpm',g1:'wcpm',g2:'wcpm'};
+var DMET_LABEL={k:'WCPM',g1:'WCPM',g2:'WCPM'};
 
 var SCFG=[
 {name:"Lincoln Elementary",seed:42,k:8,g1:20,g2:7,seats:0},
@@ -224,7 +231,7 @@ g2:cfg.g2>0?genStudents(r,cfg.g2,'g2'):[]}};
 });
 
 var st={view:'district',si:null,gk:null,gm:{},sort:'name',asc:true,filter:'all'};
-SCHOOLS.forEach(function(s,i){st.gm[i]={k:'pa',g1:'wcpm',g2:'wcpm'};});
+SCHOOLS.forEach(function(s,i){st.gm[i]={k:'wcpm',g1:'wcpm',g2:'wcpm'};});
 
 function sc(s){return s==='on-track'?'#639922':'#E24B4A'}
 function proj(boy,cur,cap){var r=(cur-boy)/MO;var p=Math.round(boy+r*MT);if(cap!==null)p=Math.min(p,cap);return p}
@@ -286,11 +293,13 @@ return '<div class="callout"><div class="callout-pers">'+personalHtml+'</div></d
 
 function gsd(student,gk,mk){
 var m=GM[gk].metrics[mk];var d=student[mk];if(!d)return null;
+if(d.mastered){
+return{name:student.name,teacher:student.teacher,current:d.c,boy:d.b,growth:0,projected:d.c,cs:'on-track',ps:'on-track',delta:m.t!==null?d.c-m.t:null,mastered:true}}
 var cur=m.cap!==null?Math.min(d.c,m.cap):d.c;var gr=cur-d.b;
 var pr=m.t!==null?proj(d.b,cur,m.cap):null;
 var s2=m.t!==null?(pr>=m.t?'on-track':'below'):'on-track';
 var dl=m.t!==null?pr-m.t:null;
-return{name:student.name,teacher:student.teacher,current:cur,boy:d.b,growth:gr,projected:pr,cs:s2,ps:s2,delta:dl}}
+return{name:student.name,teacher:student.teacher,current:cur,boy:d.b,growth:gr,projected:pr,cs:s2,ps:s2,delta:dl,mastered:false}}
 
 function gradeStats(si,gk,mk){
 var m=GM[gk].metrics[mk];var students=SCHOOLS[si].students[gk];
@@ -411,12 +420,10 @@ var h='<button class="back-btn" onclick="navTo(\'school\','+si+')"><i class="ti 
 h+='<div class="view-title">'+sch.name+' — '+g.name+'</div>';
 h+='<div class="sub-counts"><span>'+data.length+' '+g.plural+'</span></div>';
 var gScope=sch.students[gk].map(function(s){return{student:s,gk:gk}});
-var gMetricKeys=gk==='k'?['pa','lnf']:['wcpm','hfw'];
-var gCs=calloutFor(gScope,gMetricKeys);
+var gCs=calloutFor(gScope,['wcpm','hfw']);
 var gPers;
 if(gScope.length===0){gPers='';}
-else if(gk==='k'){gPers='Your kindergartners have made <b>'+gCs.avgMonths+' months</b> of progress so far this year, learning <b>'+gCs.growths.pa+' more</b> letter sounds and recognizing <b>'+gCs.growths.lnf+' more</b> letters per minute on average.';}
-else{var gname=gk==='g1'?'1st':'2nd';gPers='Your '+gname+' graders have made <b>'+gCs.avgMonths+' months</b> of progress so far this year, reading <b>'+gCs.growths.wcpm+' more</b> words correct per minute and mastering <b>'+gCs.growths.hfw+' more</b> high-frequency words on average.';}
+else{var gLabel=gk==='k'?'kindergartners':(gk==='g1'?'1st graders':'2nd graders');gPers='Your '+gLabel+' have made <b>'+gCs.avgMonths+' months</b> of progress so far this year, reading <b>'+gCs.growths.wcpm+' more</b> words correct per minute and mastering <b>'+gCs.growths.hfw+' more</b> high-frequency words on average.';}
 h+=calloutHtml(gPers);
 var gAvgMop=avgMopFor(gScope);
 h+='<div class="metrics-row"><div class="mc"><div class="mc-l">Avg months of growth</div><div class="mc-v">'+gAvgMop+'</div><div class="mc-s">across '+data.length+' '+g.plural.toLowerCase()+'</div></div>';
@@ -436,7 +443,6 @@ h+='</div>';
 h+='<div class="legend"><div class="legend-item"><div class="ld" style="background:#639922"></div> On track</div><div class="legend-item"><div class="ld" style="background:#E24B4A"></div> Below target</div>';
 if(hasTarget)h+='<div class="legend-item" style="margin-left:8px"><div class="ll" style="background:var(--color-text-secondary)"></div> EOY target</div><div class="legend-item"><div class="ls"></div> Projected growth</div>';
 h+='</div>';
-if(!m.key)h+='<div style="font-size:12px;color:var(--color-text-tertiary);margin-bottom:1rem;font-style:italic">Emerging measure for '+g.name+'. No formal EOY target.</div>';
 
 var cN=hasTarget?'11%':'17%',cT=hasTarget?'9%':'13%',cS='8%',cCu='8%',cCh=hasTarget?'18%':'32%',cG='10%',cP='13%',cD='13%';
 h+='<div class="tc"><table><thead><tr><th style="width:'+cN+'" data-sort="name">Student <span class="sa">&#9650;</span></th><th style="width:'+cT+'" data-sort="teacher">Teacher <span class="sa">&#9650;</span></th><th style="width:'+cS+';text-align:right" data-sort="boy">Start <span class="sa">&#9650;</span></th><th style="width:'+cCu+';text-align:right" data-sort="current">Current <span class="sa">&#9650;</span></th><th class="ch" style="width:'+cCh+'"></th><th style="width:'+cG+'" data-sort="growth">Growth <span class="sa">&#9650;</span></th>';
@@ -453,6 +459,13 @@ data.sort(function(a,b){var va=a[st.sort],vb=b[st.sort];if(typeof va==='string')
 var tPct=hasTarget?Math.round(m.t/m.mx*100):0;
 var rows='';
 data.forEach(function(d){
+if(d.mastered){
+var nCols=hasTarget?6:4;
+rows+='<tr><td class="sn">'+d.name+'</td><td class="tn">'+d.teacher+'</td>';
+rows+='<td colspan="'+nCols+'" class="mastered-cell">Mastered at initial assessment</td>';
+rows+='</tr>';
+return;
+}
 var bPct=Math.max(0,Math.min(100,Math.round(d.boy/m.mx*100)));
 var cPct=Math.min(100,Math.round(d.current/m.mx*100));
 var pPct=hasTarget?Math.min(100,Math.round(d.projected/m.mx*100)):0;

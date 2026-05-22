@@ -24,23 +24,29 @@ All data is generated client-side using a seeded PRNG (mulberry32-style) so resu
 
 ### Grade configuration (`GM` object)
 
-Three grades, each with their own metrics:
+All three grades have the same four metrics in the same order so the dashboard reads consistently as students progress. WCPM is the metric of truth across grades; PA and LNF stay available as foundational checks for students who haven't yet mastered them.
 
-**Kindergarten** — 4 metrics, 2 key (PA, LNF), 2 emerging (WCPM, HFW)
+**Kindergarten** — 4 metrics, 2 key (WCPM, HFW), 2 supplementary (PA, LNF)
+- Words correct per minute: target 10, BOY benchmark 2, max 15, unit "WCPM"
+- High-frequency words: target 20, BOY benchmark 5, max 25, unit "high-frequency words"
 - Phonological awareness: target 35, BOY benchmark 14, max 45, unit "correct sound segments"
 - Letter naming fluency: target 42, BOY benchmark 17, max 55, unit "letters per minute"
-- Words correct per minute: no target, max 15, unit "WCPM" (emerging)
-- High-frequency words: no target, max 25, unit "high-frequency words" (emerging)
 
-**1st Grade** — 2 metrics, both key
+**1st Grade** — 4 metrics, 2 key (WCPM, HFW), 2 supplementary (PA, LNF)
 - Words correct per minute: target 42, BOY benchmark 17, max 58, unit "WCPM"
 - High-frequency words: target 200, BOY benchmark 80, max 220, cap 200, unit "high-frequency words"
+- Phonological awareness: target 35, BOY benchmark 14, max 45 (most 1st graders enter already mastered)
+- Letter naming fluency: target 42, BOY benchmark 17, max 55 (most 1st graders enter already mastered)
 
-**2nd Grade** — 2 metrics, both key
+**2nd Grade** — 4 metrics, 2 key (WCPM, HFW), 2 supplementary (PA, LNF)
 - Words correct per minute: target 90, BOY benchmark 40, max 110, unit "WCPM"
 - High-frequency words: target 200, BOY benchmark 120, max 220, cap 200, unit "high-frequency words"
+- Phonological awareness: target 35, BOY benchmark 14, max 45 (essentially all 2nd graders mastered)
+- Letter naming fluency: target 42, BOY benchmark 17, max 55 (essentially all 2nd graders mastered)
 
-Each metric has a `key` flag (1 = key metric used in aggregate calculations, 0 = emerging/supplementary). Metrics with `cap` cannot exceed that value (HFW caps at 200).
+Each metric has a `key` flag (1 = key metric used in aggregate calculations, 0 = supplementary). Metrics with `cap` cannot exceed that value (HFW caps at 200).
+
+**Mastery.** If a student's BOY score for a metric is already at or above the EOY target, that student has "mastered" the metric during initial assessment. Mastered students keep their BOY score as their current value, are never re-tested for ongoing progress on that metric, and appear in the grade-view student table as a single "Mastered at initial assessment" row in place of their numeric data. They count as "on track" for that metric in the projected-to-meet-target percentage, but contribute zero growth to the average-growth calculation.
 
 Each grade also has `plural` labels: "Kindergartners", "1st Graders", "2nd Graders".
 
@@ -146,9 +152,9 @@ The numeric Current value sits to the right of Start so the two reference number
 4. Projected growth zone: diagonal slash pattern (45deg repeating gradient, 2px stripes at 6px intervals) in the status color, extending from current to projected position
 5. Target marker: 2px wide, 18px tall tick mark at the target percentage
 
-**Metric toggle buttons** (grade view) — horizontal row of pill buttons. Active state uses info color scheme. All metrics for that grade are available (not just key metrics). No asterisks on button labels.
+**Metric toggle buttons** (grade view) — horizontal row of pill buttons. Active state uses info color scheme. All four metrics are available on every grade view, always in the same order: Words correct per minute, High-frequency words, Phonological awareness, Letter naming fluency. WCPM is selected by default for every grade. Below 640px viewport, the buttons collapse into a `<select>` dropdown with the same order. No asterisks on button labels.
 
-**Emerging metric note** — when viewing a non-key metric, italic text appears: "Emerging measure for [Grade]. No formal EOY target." Legend and table columns for projected/delta are hidden.
+**Mastery row treatment** — when a student is mastered on the currently-viewed metric, the row collapses the numeric and chart columns into a single italic "Mastered at initial assessment" cell. Student name and teacher columns remain.
 
 **Legend** — small colored squares for On track/Below target, a line for EOY target, and the slash pattern swatch for Projected growth. Only target-related items show when viewing a metric with a target.
 
