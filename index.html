@@ -460,7 +460,15 @@ renderRows(si,gk)}
 function renderRows(si,gk){
 var mk=st.gm[si][gk];var m=GM[gk].metrics[mk];var hasTarget=m.t!==null;
 var data=SCHOOLS[si].students[gk].map(function(s){return gsd(s,gk,mk)}).filter(Boolean);
-data.sort(function(a,b){var va=a[st.sort],vb=b[st.sort];if(typeof va==='string'){va=va.toLowerCase();vb=vb.toLowerCase()}if(va<vb)return st.asc?-1:1;if(va>vb)return st.asc?1:-1;return 0});
+data.sort(function(a,b){
+// Mastered students always group at the bottom regardless of column sort.
+if(a.mastered!==b.mastered)return a.mastered?1:-1;
+var va=a[st.sort],vb=b[st.sort];
+if(typeof va==='string'){va=va.toLowerCase();vb=vb.toLowerCase()}
+if(va<vb)return st.asc?-1:1;
+if(va>vb)return st.asc?1:-1;
+return 0
+});
 var tPct=hasTarget?Math.round(m.t/m.mx*100):0;
 var rows='';
 data.forEach(function(d){

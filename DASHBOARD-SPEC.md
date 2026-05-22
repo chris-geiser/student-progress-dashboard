@@ -154,7 +154,7 @@ The numeric Current value sits to the right of Start so the two reference number
 
 **Metric toggle buttons** (grade view) — horizontal row of pill buttons. Active state uses info color scheme. All four metrics are available on every grade view, always in the same order: Words correct per minute, High-frequency words, Phonological awareness, Letter naming fluency. WCPM is selected by default for every grade. Below 640px viewport, the buttons collapse into a `<select>` dropdown with the same order. No asterisks on button labels.
 
-**Mastery row treatment** — when a student is mastered on the currently-viewed metric, the row collapses the numeric and chart columns into a single italic "Mastered at initial assessment" cell. Student name and teacher columns remain.
+**Mastery row treatment** — when a student is mastered on the currently-viewed metric, the row collapses the numeric and chart columns into a single italic "Mastered at initial assessment" cell. Student name and teacher columns remain. Mastered rows always group together at the bottom of the table regardless of which column is sorted, so working students (the ones who still need progress monitoring) cluster at the top where attention should go.
 
 **Legend** — small colored squares for On track/Below target, a line for EOY target, and the slash pattern swatch for Projected growth. Only target-related items show when viewing a metric with a target.
 
