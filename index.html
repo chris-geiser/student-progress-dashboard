@@ -306,7 +306,11 @@ var m=GM[gk].metrics[mk];var students=SCHOOLS[si].students[gk];
 var all=students.map(function(s){return gsd(s,gk,mk)}).filter(Boolean);
 if(!all.length)return{avg:0,avgGr:0,projMet:0,projPct:0,total:0};
 var avg=Math.round(all.reduce(function(a,d){return a+d.current},0)/all.length);
-var avgGr=Math.round(all.reduce(function(a,d){return a+d.growth},0)/all.length);
+// Exclude mastered students from average growth: they didn't need to grow
+// (BOY was already at or above target), so including 0s would drag the
+// average down and misrepresent the working students' progress.
+var working=all.filter(function(d){return !d.mastered});
+var avgGr=working.length?Math.round(working.reduce(function(a,d){return a+d.growth},0)/working.length):0;
 var projMet=m.t!==null?all.filter(function(d){return d.projected>=m.t}).length:0;
 var projPct=m.t!==null?Math.round(projMet/all.length*100):0;
 return{avg:avg,avgGr:avgGr,projMet:projMet,projPct:projPct,total:all.length}}
@@ -412,7 +416,8 @@ var sch=SCHOOLS[si];var g=GM[gk];var mk=st.gm[si][gk];var m=g.metrics[mk];var ha
 var keys=Object.keys(g.metrics);
 var data=sch.students[gk].map(function(s){return gsd(s,gk,mk)}).filter(Boolean);
 var avg=data.length?Math.round(data.reduce(function(a,d){return a+d.current},0)/data.length):0;
-var avgGr=data.length?Math.round(data.reduce(function(a,d){return a+d.growth},0)/data.length):0;
+var working=data.filter(function(d){return !d.mastered});
+var avgGr=working.length?Math.round(working.reduce(function(a,d){return a+d.growth},0)/working.length):0;
 var projMet=hasTarget?data.filter(function(d){return d.projected>=m.t}).length:0;
 var projPct=hasTarget&&data.length?Math.round(projMet/data.length*100):0;
 
