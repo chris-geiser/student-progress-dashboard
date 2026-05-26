@@ -120,7 +120,7 @@ System font stack. Two weights for the body of the design system: 400 (regular) 
 
 The months-of-progress figure uses a proxy formula until a real definition lands: per student, `(current − BOY) / (target − BOY) × total_school_months`, capped at total months, then averaged across all students and metrics in scope. The benchmark percentage and benchmark months are hard-coded placeholders.
 
-**View title** — 18px, weight 500. District view shows district name, school view shows school name, grade view shows "[School Name] — [Grade Name]".
+**View title** — 18px, weight 500. District view shows district name, school view shows school name, grade view shows "[School Name] — [Grade Name]". On the district and school views the title sits in a flex header with an **open-seats block** pinned to the top right: when seats are open it shows "N open seats" plus a "Fill Seats" call-to-action button (info color scheme); when all seats are filled it shows "All seats filled" in subtle tertiary text. The block stacks below the title on viewports under 640px. Open seats is no longer a summary metric card — the top metric row on district and school views is now two cards (Avg months of growth, Projected to meet target).
 
 **Counts subtitle bar** — 13px secondary text, light rules above and below, dot separators between items. Content varies by view level:
 - District: total students, per-grade student counts
