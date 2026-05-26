@@ -73,7 +73,7 @@ body{font-family:var(--font-sans);margin:0;padding:2rem;color:var(--color-text-p
 .cm-name{font-size:13px;color:var(--color-text-primary);margin-bottom:12px}
 .cm-bar-wrap{position:relative;margin-bottom:8px}
 .cm-bar{height:28px;background:var(--color-background-secondary);border-radius:14px;position:relative;overflow:visible}
-.cm-fill{position:absolute;top:0;height:100%;border-radius:14px;z-index:2}
+.cm-fill{position:absolute;top:0;height:100%;border-radius:14px 0 0 14px;z-index:2}
 .cm-proj{position:absolute;top:0;height:100%;z-index:1;overflow:hidden}
 .cm-proj-i{width:100%;height:100%}
 .cm-start{position:absolute;top:4px;width:20px;height:20px;border-radius:50%;background:#ffffff;border:2px solid var(--color-text-tertiary);z-index:3}
@@ -105,7 +105,7 @@ tr:last-child td{border-bottom:none}
 .tn{color:var(--color-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bw{display:flex;align-items:center;gap:8px}
 .bb{width:100%;height:12px;background:var(--color-background-secondary);border-radius:6px;min-width:60px;overflow:visible;position:relative}
-.bf{position:absolute;top:0;height:100%;border-radius:6px;z-index:2}
+.bf{position:absolute;top:0;height:100%;border-radius:6px 0 0 6px;z-index:2}
 .bp{position:absolute;top:0;height:100%;z-index:1;overflow:hidden}
 .bp-i{width:100%;height:100%}
 .bs{position:absolute;top:0;width:12px;height:12px;border-radius:50%;background:#ffffff;border:2px solid var(--color-text-tertiary);z-index:3}
@@ -369,14 +369,25 @@ return h;
 }
 
 function renderMonthsChart(months){
-var pct=Math.min(100,months/MT*100);
-var status=months>=MO?'on-track':'below';
+// Project current months of growth forward: rate so far (months / MO) extended to the full year (MT).
+var projected=Math.round(months*MT/MO);
+var mx=Math.round(MT*1.5); // room to show projections beyond a full year of growth
+var cp=Math.min(100,months/mx*100);
+var pp=Math.min(100,projected/mx*100);
+var tp=MT/mx*100;
+var status=projected>=MT?'on-track':'below';
 var col=sc(status);
 var h='<div class="cm"><div class="cm-name">Total months of growth</div><div class="cm-bar-wrap"><div class="cm-bar">';
-h+='<div class="cm-fill" style="left:0%;width:'+pct+'%;background:'+col+';border-radius:14px"></div>';
-h+='<div class="cm-pill" style="left:'+pct+'%" title="Months of growth: '+months+'">'+months+' mo.</div>';
+if(pp>cp)h+='<div class="cm-proj" style="left:'+cp+'%;width:'+(pp-cp)+'%"><div class="cm-proj-i" style="background:'+slBg(col)+'"></div></div>';
+h+='<div class="cm-fill" style="left:0%;width:'+cp+'%;background:'+col+'"></div>';
+h+='<div class="cm-target" style="left:'+tp+'%"></div>';
+var pills=pickVisiblePills([
+{key:'projected',pct:pp,label:projected+' mo.',full:'Projected: '+projected+' months of growth'},
+{key:'current',pct:cp,label:months+' mo.',full:'Current: '+months+' months of growth'}
+]);
+pills.forEach(function(p){h+='<div class="cm-pill" style="left:'+p.pct+'%" title="'+p.full+'">'+p.label+'</div>'});
 h+='</div></div>';
-h+='<div class="cm-stats"><span class="cm-stat"><b>'+months+' of '+MT+'</b> total school months</span></div>';
+h+='<div class="cm-stats"><span class="cm-stat">projected <b>'+projected+' months</b> of growth by year-end</span></div>';
 h+='</div>';
 return h;
 }
