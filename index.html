@@ -43,6 +43,7 @@ html{background:var(--color-background-tertiary)}
 body{font-family:var(--font-sans);margin:0;padding:2rem;color:var(--color-text-primary);max-width:780px;margin:0 auto}
 *{box-sizing:border-box;margin:0;padding:0}
 .dash{padding:0.5rem 0}
+.dash-footer{font-size:12px;color:var(--color-text-tertiary);text-align:center;margin-top:2rem;padding-top:1rem;border-top:0.5px solid var(--color-border-tertiary)}
 .metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem}
 .mc{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:0.75rem 1rem}
 .mc-l{font-size:12px;color:var(--color-text-secondary);margin-bottom:4px}
@@ -151,6 +152,7 @@ tr:last-child td{border-bottom:none}
 </head>
 <body>
 <div class="dash" id="app"></div>
+<div class="dash-footer" id="app-footer"></div>
 <script>
 var MO=4,MT=10;
 var GM={
@@ -614,6 +616,9 @@ else if(st.view==='school')renderSchool(st.si);
 else renderGrade(st.si,st.gk);
 }
 render();
+
+// Data-freshness note: data refreshes at the top of every hour.
+(function(){var n=new Date();n.setMinutes(0,0,0);var t=n.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});var f=document.getElementById('app-footer');if(f)f.textContent='Data updates at the top of every hour. Last updated '+t+'.';})();
 </script>
 </body>
 </html>
