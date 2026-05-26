@@ -77,7 +77,6 @@ body{font-family:var(--font-sans);margin:0;padding:2rem;color:var(--color-text-p
 .cm-fill{position:absolute;top:0;height:100%;border-radius:14px 0 0 14px;z-index:2}
 .cm-proj{position:absolute;top:0;height:100%;z-index:1;overflow:hidden}
 .cm-proj-i{width:100%;height:100%}
-.cm-start{position:absolute;top:4px;width:20px;height:20px;border-radius:50%;background:#ffffff;border:2px solid var(--color-text-tertiary);z-index:3}
 .cm-target{position:absolute;top:-2px;height:34px;width:2px;border-radius:1px;background:var(--color-text-secondary);z-index:3}
 .cm-pill{position:absolute;top:50%;transform:translate(-50%,-50%);font-size:11px;font-weight:500;background:#ffffff;border:1px solid var(--color-border-tertiary);border-radius:10px;padding:2px 6px;z-index:5;white-space:nowrap;line-height:1.2;color:var(--color-text-primary)}
 .cm-target-pill{position:absolute;top:32px;transform:translateX(-50%);font-size:11px;font-weight:500;background:#ffffff;border:0.5px solid var(--color-border-tertiary);border-radius:10px;padding:2px 6px;z-index:5;white-space:nowrap;line-height:1.2;color:var(--color-text-secondary)}
@@ -359,7 +358,6 @@ var visible=pickVisiblePills(pillSpecs);
 var h='<div class="cm"><div class="cm-name">'+title+'</div><div class="cm-bar-wrap"><div class="cm-bar">';
 if(pp>cp)h+='<div class="cm-proj" style="left:'+cp+'%;width:'+(pp-cp)+'%"><div class="cm-proj-i" style="background:'+slBg(col)+'"></div></div>';
 h+='<div class="cm-fill" style="left:'+bp+'%;width:'+Math.max(0,cp-bp)+'%;background:'+col+'"></div>';
-h+='<div class="cm-start" style="left:'+bp+'%;transform:translateX(-50%);border-color:'+col+'"></div>';
 h+='<div class="cm-target" style="left:'+tp+'%"></div>';
 visible.forEach(function(p){h+='<div class="cm-pill" style="left:'+p.pct+'%;border-color:'+col+'" title="'+p.full+'">'+p.label+'</div>'});
 h+='</div><div class="cm-target-pill" style="left:'+tp+'%" title="Target: '+stats.target+'">'+stats.target+'</div></div>';
