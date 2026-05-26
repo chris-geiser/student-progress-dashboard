@@ -59,21 +59,21 @@ body{font-family:var(--font-sans);margin:0;padding:2rem;color:var(--color-text-p
 .gc-name{font-size:16px;font-weight:500;color:var(--color-text-primary)}
 .gc-count{font-size:13px;color:var(--color-text-secondary);margin-left:8px}
 .gc-arrow{font-size:18px;color:var(--color-text-tertiary)}
-.gc-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:32px 48px}
-.mm{padding:0}
-.mm-name{font-size:13px;color:var(--color-text-primary);margin-bottom:8px}
-.mm-bar-wrap{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.mm-bar-bg{flex:1;height:8px;background:var(--color-background-secondary);border-radius:4px;position:relative;overflow:visible}
-.mm-bar-fill{position:absolute;top:0;height:100%;border-radius:4px}
-.mm-bs{position:absolute;top:-1px;width:10px;height:10px;border-radius:50%;background:#ffffff;border:2px solid var(--color-text-tertiary);z-index:3}
-.mm-bench{position:absolute;top:-2px;height:12px;width:2px;border-radius:1px;background:var(--color-text-secondary)}
-.mm-val{font-size:13px;font-weight:500;white-space:nowrap;min-width:50px;text-align:right}
-.mm-val .t{color:var(--color-text-tertiary);font-weight:400}
-.mm-val .arr{color:var(--color-text-tertiary);font-weight:400;margin:0 4px}
-.mm-stats{display:flex;flex-wrap:wrap}
-.mm-stat{font-size:12px;color:var(--color-text-secondary)}
-.mm-stat+.mm-stat::before{content:"·";margin:0 8px;color:var(--color-text-tertiary)}
-.mm-stat b{font-weight:500}
+.gc-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:40px 32px}
+@media (max-width:899px){.gc-metrics{grid-template-columns:repeat(2,1fr)}}
+.cm{padding:0;min-width:0}
+.cm-name{font-size:13px;color:var(--color-text-primary);margin-bottom:12px}
+.cm-bar-wrap{position:relative;margin-bottom:8px}
+.cm-bar{height:28px;background:var(--color-background-secondary);border-radius:14px;position:relative;overflow:visible}
+.cm-fill{position:absolute;top:0;height:100%;border-radius:14px;z-index:2}
+.cm-proj{position:absolute;top:0;height:100%;z-index:1;overflow:hidden}
+.cm-proj-i{width:100%;height:100%}
+.cm-start{position:absolute;top:4px;width:20px;height:20px;border-radius:50%;background:#ffffff;border:2px solid var(--color-text-tertiary);z-index:3}
+.cm-target{position:absolute;top:-2px;height:32px;width:2px;border-radius:1px;background:var(--color-text-secondary);z-index:3}
+.cm-pill{position:absolute;top:50%;transform:translate(-50%,-50%);font-size:11px;font-weight:500;background:#ffffff;border:0.5px solid var(--color-border-tertiary);border-radius:10px;padding:2px 6px;z-index:5;white-space:nowrap;line-height:1.2;color:var(--color-text-primary)}
+.cm-stats{display:flex;flex-wrap:wrap;font-size:12px;color:var(--color-text-secondary)}
+.cm-stats+.cm-stats::before,.cm-stat+.cm-stat::before{content:"·";margin:0 8px;color:var(--color-text-tertiary)}
+.cm-stats b{font-weight:500}
 .controls-row{display:flex;gap:8px;margin-bottom:1.5rem;align-items:center;flex-wrap:wrap}
 .controls-buttons{display:flex;gap:8px;flex-wrap:wrap}
 .controls-select{display:none;width:100%;font-size:13px;padding:8px 10px;font-family:var(--font-sans);background:var(--color-background-primary);color:var(--color-text-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md)}
@@ -291,6 +291,83 @@ if(!personalHtml)return '';
 return '<div class="callout"><div class="callout-pers">'+personalHtml+'</div></div>';
 }
 
+// Aggregate stats for a metric (wcpm or hfw) across a scope of {student, gk} items.
+// Real numbers — averaged regardless of grade. Target is the weighted average target
+// across the same students. Mastered students excluded from avg growth but counted as
+// "projected to meet target".
+function metricAgg(scope,mk){
+var boys=[],currs=[],projs=[],targets=[],growths=[],mx=0,projMet=0;
+scope.forEach(function(it){
+var m=GM[it.gk].metrics[mk];if(!m||m.t==null)return;
+var d=gsd(it.student,it.gk,mk);if(!d)return;
+boys.push(d.boy);currs.push(d.current);projs.push(d.projected);targets.push(m.t);
+if(!d.mastered)growths.push(d.growth);
+if(d.mastered||d.projected>=m.t)projMet++;
+if(m.mx>mx)mx=m.mx;
+});
+if(!boys.length)return null;
+function avg(a){return a.length?a.reduce(function(x,y){return x+y},0)/a.length:0}
+return{
+boy:Math.round(avg(boys)),current:Math.round(avg(currs)),
+projected:Math.round(avg(projs)),target:Math.round(avg(targets)),
+growth:Math.round(avg(growths)),projPct:Math.round(projMet/boys.length*100),
+mx:mx,count:boys.length
+};
+}
+
+function pickVisiblePills(specs){
+// specs: array in priority order (highest first). Each item: {pct, label, full, key}
+var threshold=14;var visible=[];
+specs.forEach(function(p){
+var collides=visible.some(function(v){return Math.abs(v.pct-p.pct)<threshold});
+if(!collides)visible.push(p);
+});
+return visible;
+}
+
+function renderMetricChart(stats,title){
+if(!stats||!stats.mx)return '<div class="cm"><div class="cm-name">'+title+'</div><div class="cm-stats" style="font-style:italic">No data</div></div>';
+var mx=stats.mx;
+var bp=Math.max(0,Math.min(100,stats.boy/mx*100));
+var cp=Math.min(100,stats.current/mx*100);
+var pp=Math.min(100,stats.projected/mx*100);
+var tp=Math.min(100,stats.target/mx*100);
+var status=stats.projected>=stats.target?'on-track':'below';
+var col=sc(status);
+// Priority: Start > Projected > Current > Target
+var pillSpecs=[
+{key:'start',pct:bp,label:stats.boy,full:'Start: '+stats.boy},
+{key:'projected',pct:pp,label:stats.projected,full:'Projected: '+stats.projected},
+{key:'current',pct:cp,label:stats.current,full:'Current: '+stats.current},
+{key:'target',pct:tp,label:stats.target,full:'Target: '+stats.target}
+];
+var visible=pickVisiblePills(pillSpecs);
+var h='<div class="cm"><div class="cm-name">'+title+'</div><div class="cm-bar-wrap"><div class="cm-bar">';
+if(pp>cp)h+='<div class="cm-proj" style="left:'+cp+'%;width:'+(pp-cp)+'%"><div class="cm-proj-i" style="background:'+slBg(col)+'"></div></div>';
+h+='<div class="cm-fill" style="left:'+bp+'%;width:'+Math.max(0,cp-bp)+'%;background:'+col+'"></div>';
+h+='<div class="cm-start" style="left:'+bp+'%;transform:translateX(-50%);border-color:'+col+'"></div>';
+h+='<div class="cm-target" style="left:'+tp+'%"></div>';
+visible.forEach(function(p){h+='<div class="cm-pill" style="left:'+p.pct+'%" title="'+p.full+'">'+p.label+'</div>'});
+h+='</div></div>';
+var gSign=stats.growth>=0?'+':'';
+h+='<div class="cm-stats"><span class="cm-stat"><b>'+gSign+stats.growth+'</b> average growth</span><span class="cm-stat"><b>'+stats.projPct+'%</b> projected to meet target</span></div>';
+h+='</div>';
+return h;
+}
+
+function renderMonthsChart(months){
+var pct=Math.min(100,months/MT*100);
+var status=months>=MO?'on-track':'below';
+var col=sc(status);
+var h='<div class="cm"><div class="cm-name">Total months of growth</div><div class="cm-bar-wrap"><div class="cm-bar">';
+h+='<div class="cm-fill" style="left:0%;width:'+pct+'%;background:'+col+';border-radius:14px"></div>';
+h+='<div class="cm-pill" style="left:'+pct+'%" title="Months of growth: '+months+'">'+months+' mo.</div>';
+h+='</div></div>';
+h+='<div class="cm-stats"><span class="cm-stat"><b>'+months+' of '+MT+'</b> total school months</span></div>';
+h+='</div>';
+return h;
+}
+
 function gsd(student,gk,mk){
 var m=GM[gk].metrics[mk];var d=student[mk];if(!d)return null;
 if(d.mastered){
@@ -359,21 +436,14 @@ h+='<div class="mc"><div class="mc-l">Open seats</div><div class="mc-v">'+totalS
 
 SCHOOLS.forEach(function(sch,i){
 var ss=schoolStats(i);
-var sg=schoolGrades(i);
+var schAllScope=[];GKS.forEach(function(gk){sch.students[gk].forEach(function(s){schAllScope.push({student:s,gk:gk})})});
+var schMonths=avgMopFor(schAllScope);
+var schWcpm=metricAgg(schAllScope,'wcpm');
+var schHfw=metricAgg(schAllScope,'hfw');
 h+='<div class="gc" onclick="navTo(\'school\','+i+')"><div class="gc-head"><div><span class="gc-name">'+sch.name+'</span><span class="gc-count">'+ss.total+' students</span></div><i class="ti ti-chevron-right gc-arrow" aria-hidden="true"></i></div><div class="gc-metrics">';
-sg.forEach(function(gk){
-var gn=GM[gk].name;var dmk=DMET[gk];var m=GM[gk].metrics[dmk];var s=gradeStats(i,gk,dmk);
-var avgPct=Math.min(100,Math.round(s.avg/m.mx*100));
-var avgBoy=s.avg-s.avgGr;var avgBoyPct=Math.max(0,Math.min(100,Math.round(avgBoy/m.mx*100)));
-var avgProj=proj(Math.round(s.avg*(MO/MT)),s.avg,m.cap);var col=sc(avgProj>=m.t?'on-track':'below');
-h+='<div class="mm"><div class="mm-name">'+gn+' average '+DMET_LABEL[gk]+'</div><div class="mm-bar-wrap"><div class="mm-bar-bg"><div class="mm-bar-fill" style="left:'+avgBoyPct+'%;width:'+(avgPct-avgBoyPct)+'%;background:'+col+'"></div>';
-h+='<div class="mm-bs" style="left:'+avgBoyPct+'%;border-color:'+col+'"></div>';
-var tPct=Math.round(m.t/m.mx*100);h+='<div class="mm-bench" style="left:'+tPct+'%"></div>';
-h+='</div><div class="mm-val"><span class="t">'+avgBoy+'</span><span class="arr">&rarr;</span>'+s.avg+'<span class="arr">&rarr;</span><span class="t">'+m.t+'</span></div></div><div class="mm-stats">';
-h+='<div class="mm-stat"><b>+'+s.avgGr+'</b> average growth</div>';
-h+='<div class="mm-stat"><b>'+s.projPct+'%</b> projected to meet target</div>';
-h+='</div></div>';
-});
+h+=renderMonthsChart(schMonths);
+h+=renderMetricChart(schWcpm,'Words correct per minute');
+h+=renderMetricChart(schHfw,'High-frequency words');
 h+='</div></div>';
 });
 app.innerHTML=h}
@@ -398,14 +468,15 @@ h+='<div class="mc"><div class="mc-l">Projected to meet target</div><div class="
 h+='<div class="mc"><div class="mc-l">Open seats</div><div class="mc-v">'+sch.seats+'</div><div class="mc-s">'+(sch.seats===0?'all seats filled':sch.seats+' available')+'</div></div></div>';
 
 sg.forEach(function(gk){
-var g=GM[gk];var keys=Object.keys(g.metrics).filter(function(mk){return g.metrics[mk].key});
+var g=GM[gk];
+var gScope=sch.students[gk].map(function(s){return{student:s,gk:gk}});
+var gMonths=avgMopFor(gScope);
+var gWcpm=metricAgg(gScope,'wcpm');
+var gHfw=metricAgg(gScope,'hfw');
 h+='<div class="gc" onclick="navTo(\'grade\','+si+',\''+gk+'\')"><div class="gc-head"><div><span class="gc-name">'+g.name+'</span><span class="gc-count">'+sch.students[gk].length+' students</span></div><i class="ti ti-chevron-right gc-arrow" aria-hidden="true"></i></div><div class="gc-metrics">';
-keys.forEach(function(mk){
-var m=g.metrics[mk];var s=gradeStats(si,gk,mk);
-var avgPct=Math.min(100,Math.round(s.avg/m.mx*100));var tPct=Math.round(m.t/m.mx*100);var avgP=proj(Math.round(s.avg*(MO/MT)),s.avg,m.cap);var col=sc(avgP>=m.t?'on-track':'below');
-var avgBoy=s.avg-s.avgGr;var avgBoyPct=Math.max(0,Math.min(100,Math.round(avgBoy/m.mx*100)));
-h+='<div class="mm"><div class="mm-name">Average '+m.n.toLowerCase()+'</div><div class="mm-bar-wrap"><div class="mm-bar-bg"><div class="mm-bar-fill" style="left:'+avgBoyPct+'%;width:'+(avgPct-avgBoyPct)+'%;background:'+col+'"></div><div class="mm-bs" style="left:'+avgBoyPct+'%;border-color:'+col+'"></div><div class="mm-bench" style="left:'+tPct+'%"></div></div><div class="mm-val"><span class="t">'+avgBoy+'</span><span class="arr">&rarr;</span>'+s.avg+'<span class="arr">&rarr;</span><span class="t">'+m.t+'</span></div></div><div class="mm-stats"><div class="mm-stat"><b>+'+s.avgGr+'</b> average growth</div><div class="mm-stat"><b>'+s.projPct+'%</b> projected to meet target</div></div></div>';
-});
+h+=renderMonthsChart(gMonths);
+h+=renderMetricChart(gWcpm,'Words correct per minute');
+h+=renderMetricChart(gHfw,'High-frequency words');
 h+='</div></div>';
 });
 app.innerHTML=h}

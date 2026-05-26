@@ -131,7 +131,13 @@ The months-of-progress figure uses a proxy formula until a real definition lands
 
 **School/grade cards** — white background, 0.5px tertiary border, 12px border radius. Clickable with hover state (border darkens). Header has name + student count on left, chevron-right icon on right.
 
-**Metric summary bars** (on cards) — 2-column grid layout. Each metric shows: 13px primary-text label, 8px tall bar with status-colored fill from average BOY to average current position, a 10px white start dot with a 2px status-colored stroke at the average BOY position, a 2px tall benchmark tick mark at the target position, a start → current → target value triplet (BOY in tertiary, current in primary weight 500, target in tertiary, light arrow separators), and a single stats line below the bar with average growth and % projected to meet target separated by a dot.
+**Aggregate metric charts** (on district school cards and school grade cards) — three charts per card laid out in a responsive grid (3-across desktop, 2-across tablet, 1-across mobile). Each card shows the same three charts in the same order: Total months of growth, Words correct per minute, High-frequency words.
+
+Each chart shares a common shape: a 13px primary-text label above a 28px tall bar with rounded ends. The WCPM and HFW charts contain a status-colored solid fill from average BOY to average current, a diagonal slash pattern from average current to average projected, a white start dot with status-colored stroke at the BOY position, a vertical target tick at the target position, and pill labels overlaying the bar at the BOY / Current / Projected / Target positions. The pills are small white chips with a tertiary border and primary-text numbers. When pills would collide horizontally, lower-priority pills are hidden in this order: Start > Projected > Current > Target. A stats line under the bar reads "+N average growth · X% projected to meet target".
+
+The Months of growth chart uses the same bar shape but on a 0-to-10-school-months scale, fills from 0 to the average months achieved, shows a single pill with the value, and reads "X of 10 total school months" below. Bar color: green if achieved ≥ months elapsed (on pace), red if behind.
+
+Aggregate math: WCPM and HFW averages use raw scores across all students in scope regardless of grade. The target tick uses the weighted-average target across the same students. Mastered students contribute their BOY/current as their values (no growth) and count as "projected to meet target".
 
 **Student table** (grade view only) — fixed table layout. Sortable columns with arrow indicators. Columns:
 - Student (name, weight 500, truncates with ellipsis)
