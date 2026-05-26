@@ -44,11 +44,12 @@ body{font-family:var(--font-sans);margin:0;padding:2rem;color:var(--color-text-p
 *{box-sizing:border-box;margin:0;padding:0}
 .dash{padding:0.5rem 0}
 .metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem}
-.metrics-row.two{grid-template-columns:repeat(2,1fr)}
 .mc{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:0.75rem 1rem}
 .mc-l{font-size:12px;color:var(--color-text-secondary);margin-bottom:4px}
 .mc-v{font-size:22px;font-weight:500;color:var(--color-text-primary)}
 .mc-s{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.mc-trend{font-size:12px;color:var(--color-text-tertiary);margin-top:4px}
+.mc-trend .pos{font-weight:500}
 .back-btn{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--color-text-info);cursor:pointer;margin-bottom:1rem;background:none;border:none;font-family:var(--font-sans);padding:0}
 .back-btn:hover{text-decoration:underline}
 .view-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
@@ -392,6 +393,26 @@ h+='</div>';
 return h;
 }
 
+// Deterministic "since last week" trend for the prototype (no real week-over-week history).
+function trendFor(value){return Math.max(1,Math.round(value*0.05))}
+
+function projCard(label,value){
+var t=trendFor(value);
+return '<div class="mc"><div class="mc-l">'+label+'</div><div class="mc-v">'+value+'</div><div class="mc-s">by year-end</div><div class="mc-trend"><span class="pos">+'+t+'</span> since last week</div></div>';
+}
+
+// Three projected year-end summary cards for any scope of {student, gk} items.
+function metricCards(scope){
+var projMonths=Math.round(avgMopFor(scope)*MT/MO);
+var w=metricAgg(scope,'wcpm');var f=metricAgg(scope,'hfw');
+var h='<div class="metrics-row">';
+h+=projCard('Projected months of growth',projMonths);
+h+=projCard('Projected WCPM',w?w.projected:0);
+h+=projCard('Projected HFW',f?f.projected:0);
+h+='</div>';
+return h;
+}
+
 function gsd(student,gk,mk){
 var m=GM[gk].metrics[mk];var d=student[mk];if(!d)return null;
 if(d.mastered){
@@ -453,9 +474,7 @@ var dCs=calloutFor(dScope,['wcpm','hfw']);
 var dPers=dScope.length?'Your 1st and 2nd graders have made <b>'+dCs.avgMonths+' months</b> of progress so far this year, reading <b>'+dCs.growths.wcpm+' more</b> words correct per minute and mastering <b>'+dCs.growths.hfw+' more</b> high-frequency words on average.':'';
 h+=calloutHtml(dPers);
 var dAllScope=[];SCHOOLS.forEach(function(sch){GKS.forEach(function(gk){sch.students[gk].forEach(function(s){dAllScope.push({student:s,gk:gk})})})});
-var dAvgMop=avgMopFor(dAllScope);
-h+='<div class="metrics-row two"><div class="mc"><div class="mc-l">Avg months of growth</div><div class="mc-v">'+dAvgMop+'</div><div class="mc-s">across '+total+' students</div></div>';
-h+='<div class="mc"><div class="mc-l">Projected to meet target</div><div class="mc-v">'+pct+'%</div><div class="mc-s">'+allPm+' of '+total+' students</div></div></div>';
+h+=metricCards(dAllScope);
 
 SCHOOLS.forEach(function(sch,i){
 var ss=schoolStats(i);
@@ -485,9 +504,7 @@ var schCs=calloutFor(schScope,['wcpm','hfw']);
 var schPers=schScope.length?'Your 1st and 2nd graders have made <b>'+schCs.avgMonths+' months</b> of progress so far this year, reading <b>'+schCs.growths.wcpm+' more</b> words correct per minute and mastering <b>'+schCs.growths.hfw+' more</b> high-frequency words on average.':'';
 h+=calloutHtml(schPers);
 var schAllScope=[];GKS.forEach(function(gk){sch.students[gk].forEach(function(s){schAllScope.push({student:s,gk:gk})})});
-var schAvgMop=avgMopFor(schAllScope);
-h+='<div class="metrics-row two"><div class="mc"><div class="mc-l">Avg months of growth</div><div class="mc-v">'+schAvgMop+'</div><div class="mc-s">across '+ss.total+' students</div></div>';
-h+='<div class="mc"><div class="mc-l">Projected to meet target</div><div class="mc-v">'+ss.projPct+'%</div><div class="mc-s">'+ss.projMet+' of '+ss.total+' students</div></div></div>';
+h+=metricCards(schAllScope);
 
 sg.forEach(function(gk){
 var g=GM[gk];
@@ -508,11 +525,6 @@ var app=document.getElementById('app');
 var sch=SCHOOLS[si];var g=GM[gk];var mk=st.gm[si][gk];var m=g.metrics[mk];var hasTarget=m.t!==null;
 var keys=Object.keys(g.metrics);
 var data=sch.students[gk].map(function(s){return gsd(s,gk,mk)}).filter(Boolean);
-var avg=data.length?Math.round(data.reduce(function(a,d){return a+d.current},0)/data.length):0;
-var working=data.filter(function(d){return !d.mastered});
-var avgGr=working.length?Math.round(working.reduce(function(a,d){return a+d.growth},0)/working.length):0;
-var projMet=hasTarget?data.filter(function(d){return d.projected>=m.t}).length:0;
-var projPct=hasTarget&&data.length?Math.round(projMet/data.length*100):0;
 
 var h='<button class="back-btn" onclick="navTo(\'school\','+si+')"><i class="ti ti-arrow-left" style="font-size:14px" aria-hidden="true"></i> '+sch.name+'</button>';
 h+='<div class="view-title">'+sch.name+' — '+g.name+'</div>';
@@ -523,12 +535,7 @@ var gPers;
 if(gScope.length===0){gPers='';}
 else{var gLabel=gk==='k'?'kindergartners':(gk==='g1'?'1st graders':'2nd graders');gPers='Your '+gLabel+' have made <b>'+gCs.avgMonths+' months</b> of progress so far this year, reading <b>'+gCs.growths.wcpm+' more</b> words correct per minute and mastering <b>'+gCs.growths.hfw+' more</b> high-frequency words on average.';}
 h+=calloutHtml(gPers);
-var gAvgMop=avgMopFor(gScope);
-h+='<div class="metrics-row"><div class="mc"><div class="mc-l">Avg months of growth</div><div class="mc-v">'+gAvgMop+'</div><div class="mc-s">across '+data.length+' '+g.plural.toLowerCase()+'</div></div>';
-h+='<div class="mc"><div class="mc-l">Average growth (BOY to now)</div><div class="mc-v">+'+avgGr+'</div><div class="mc-s">'+m.u+'</div></div>';
-if(hasTarget){h+='<div class="mc"><div class="mc-l">Projected to meet target</div><div class="mc-v">'+projPct+'%</div><div class="mc-s">'+projMet+' of '+data.length+' students</div></div>'}
-else{h+='<div class="mc"><div class="mc-l">Students with growth</div><div class="mc-v">'+data.filter(function(d){return d.growth>0}).length+'</div><div class="mc-s">of '+data.length+' students</div></div>'}
-h+='</div>';
+h+=metricCards(gScope);
 
 h+='<div class="controls-row"><div class="controls-buttons">';
 keys.forEach(function(k){var mi=g.metrics[k];h+='<button class="tb'+(k===mk?' active':'')+'" data-mk="'+k+'" data-si="'+si+'" data-gk="'+gk+'">'+mi.n+'</button>'});

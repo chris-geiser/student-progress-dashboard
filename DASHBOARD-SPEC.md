@@ -127,7 +127,9 @@ The months-of-progress figure uses a proxy formula until a real definition lands
 - School: total students, per-grade student counts
 - Grade: student count with grade plural label
 
-**Summary metric cards** — 3-column grid. Background secondary, rounded corners. 12px label, 22px value, 12px subtitle. Content varies by view, but the first card on every view is "Avg months of growth" with the value computed via the months-of-progress proxy formula.
+**Summary metric cards** — 3-column grid. Background secondary, rounded corners. 12px label, 22px value, 12px subtitle, plus a small trend line. Every view shows the same three cards: Projected months of growth, Projected WCPM, Projected HFW. Each card's value is the projected year-end average (a count, not a percentage), the subtitle reads "by year-end", and a trend line reads "+N since last week" (the +N in on-track green). The scope is aggregate across all grades at the district and school levels, and grade-specific at the grade (student) level.
+
+The "since last week" trend is a deterministic placeholder derived from the value (the prototype has no real week-over-week history); it demonstrates the momentum indicator without claiming real time-series data.
 
 **School/grade cards** — white background, 0.5px tertiary border, 12px border radius. Clickable with hover state (border darkens). Header has name + student count on left, chevron-right icon on right.
 
