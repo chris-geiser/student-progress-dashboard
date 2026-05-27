@@ -12,9 +12,9 @@ Ignite Reading provides 1:1 virtual reading tutoring for K-2 students. This dash
 
 Three levels with full drill-down. Each level is a single-page view swap (no routing, no URL changes).
 
-1. **District view** — cards for each school, each showing grade-level summary bars
-2. **School view** — cards for each grade at that school, each showing key metric summary bars
-3. **Grade view** — student-level table with sortable columns, metric toggle buttons, and per-student bar charts
+1. **District view** — cards for each school, each showing three aggregate charts (months of growth, WCPM, high-frequency words) across all grades at that school
+2. **School view** — cards for each grade at that school, each showing the same three aggregate charts scoped to that grade
+3. **Grade view** — student-level table with sortable columns, a metric toggle (pill buttons on desktop, a dropdown on mobile), and per-student bar charts
 
 Back navigation uses a text button with a left arrow icon. The back button label is the name of the parent (school view back button says the district name, grade view back button says the school name).
 
@@ -52,7 +52,7 @@ Each grade also has `plural` labels: "Kindergartners", "1st Graders", "2nd Grade
 
 ### District metric mapping (`DMET`)
 
-At district and school card levels, one representative metric is shown per grade: PA for Kindergarten, WCPM for 1st and 2nd grade.
+`DMET` maps each grade to one representative metric (WCPM for every grade, now that WCPM is the metric of truth). It is used by the school/district "projected to meet target" count so each student is counted once against a single metric rather than once per key metric. The card-level charts aggregate WCPM, HFW, and months of growth directly (see Aggregate metric charts).
 
 ### School configuration (`SCFG`)
 
@@ -65,8 +65,11 @@ Teachers are generated per grade per school from a pool of 18 names. One teacher
 ### Student data generation
 
 For each student, for each metric:
-- If the metric has no target (emerging): BOY is 0, current is random 0 to max.
-- If the metric has a target: BOY is drawn from a grade-specific range. ~68% of students are generated "on track" (current score between a threshold and 85% of target), ~32% are generated "below" (current just above BOY). Current is always at least BOY + 1.
+- BOY is drawn from a grade-specific range (`BOY_R`).
+- If BOY is already at or above the EOY target, the student is marked **mastered** for that metric: current equals BOY and no further growth is generated.
+- Otherwise ~68% of students are generated "on track" (current score between a threshold and 85% of target) and ~32% "below" (current just above BOY). Current is always at least BOY + 1.
+
+Mastery falls out of the BOY ranges: WCPM and HFW BOY ranges sit well below their targets (no mastery), while PA and LNF BOY ranges for 1st and 2nd grade sit at or above target for most students, so most upper-grade students are mastered on the foundational metrics.
 
 ### Projection formula
 
@@ -91,7 +94,7 @@ Dark mode uses lighter variants: green `#97C459`, red `#F09595`.
 
 Status applies consistently to bar fill color, projected growth slash pattern, and projected EOY dot in the student table. All use the same color for a given student.
 
-Metrics without a target (emerging) default to "on track" status.
+Mastered students are treated as "on track" for that metric (they began at or above target).
 
 ## Visual design
 
@@ -115,19 +118,18 @@ System font stack. Two weights for the body of the design system: 400 (regular) 
 
 **Growth statement callout** — sits between the sub-counts bar and the metric cards on every view. Sits in a secondary-background block with generous padding. A single personalized sentence rendered at 18px in primary text. Key growth figures inside the sentence (months of progress, per-metric deltas) sit inline at the same 18px size in weight 700, wrapped in a white pill with a 0.5px tertiary border and small horizontal padding — a quieter "highlight" treatment that emphasizes the numbers without changing the text size or introducing additional color. (Weight 700 is a deliberate exception to the "no 600/700 weight" rule in the Typography section.) The personalized sentence adapts to the scope:
 - District and school views: aggregated across all students (K, 1st, 2nd), citing words correct per minute and high-frequency words.
-- Grade view (K): scoped to kindergartners, citing phonological awareness (letter sounds) and letter naming fluency.
-- Grade view (1st / 2nd): scoped to that grade, same metrics as the district sentence.
+- Grade view: scoped to that grade, citing words correct per minute and high-frequency words (same phrasing across all grades, including kindergarten).
 
-The months-of-progress figure uses a proxy formula until a real definition lands: per student, `(current − BOY) / (target − BOY) × total_school_months`, capped at total months, then averaged across all students and metrics in scope. The benchmark percentage and benchmark months are hard-coded placeholders.
+The months-of-progress figure uses a proxy formula until a real definition lands: per student, `(current − BOY) / (target − BOY) × total_school_months`, capped at total months, then averaged across all students and metrics in scope.
 
-**View title** — 18px, weight 500. District view shows district name, school view shows school name, grade view shows "[School Name] — [Grade Name]". On the district and school views the title sits in a flex header with an **open-seats block** pinned to the top right: when seats are open it shows "N open seats" plus a "Fill Seats" call-to-action button (info color scheme); when all seats are filled it shows "All seats filled" in subtle tertiary text. The block stacks below the title on viewports under 640px. Open seats is no longer a summary metric card — the top metric row on district and school views is now two cards (Avg months of growth, Projected to meet target).
+**View title** — 18px, weight 500. District view shows district name, school view shows school name, grade view shows "[School Name] — [Grade Name]". On the district and school views the title sits in a flex header with an **open-seats block** pinned to the top right: when seats are open it shows "N open seats" plus a "Fill Seats" call-to-action button (info color scheme); when all seats are filled it shows "All seats filled" in subtle tertiary text. The block stacks below the title on viewports under 640px. Open seats is not a summary metric card; the top metric row is described under Summary metric cards.
 
 **Counts subtitle bar** — 13px secondary text, light rules above and below, dot separators between items. Content varies by view level:
 - District: total students, per-grade student counts
 - School: total students, per-grade student counts
 - Grade: student count with grade plural label
 
-**Summary metric cards** — 3-column grid. Background secondary, rounded corners. 12px label, 22px value, 12px subtitle, plus a small trend line. Every view shows the same three cards: Projected months of growth, Projected WCPM, Projected HFW. Each card's value is the projected year-end average (a count, not a percentage), the subtitle reads "by year-end", and a trend line reads "+N since last week" (the +N in on-track green). The scope is aggregate across all grades at the district and school levels, and grade-specific at the grade (student) level.
+**Summary metric cards** — 3-column grid. Background secondary, rounded corners. 12px label, 22px value, 12px subtitle, plus a small trend line. Every view shows the same three cards: Projected months of growth, Projected WCPM, Projected HFW. Each card's value is the projected year-end average (a count, not a percentage), the subtitle reads "by year-end", and a trend line in on-track green reads "+N since last week". The scope is aggregate across all grades at the district and school levels, and grade-specific at the grade (student) level.
 
 The "since last week" trend is a deterministic placeholder derived from the value (the prototype has no real week-over-week history); it demonstrates the momentum indicator without claiming real time-series data.
 
@@ -150,10 +152,10 @@ Aggregate math: WCPM and HFW averages use raw scores across all students in scop
 - Current (current score, primary color, right-aligned, sortable)
 - Chart (inline bar chart from BOY to current, no header label, not sortable)
 - Growth (signed, green positive / red negative)
-- Projected EOY (colored dot + value, only if metric has target)
-- vs. EOY target (signed delta, only if metric has target)
+- Projected EOY (colored dot + value)
+- vs. EOY target (signed delta)
 
-The numeric Current value sits to the right of Start so the two reference numbers are adjacent, and the chart sits to the right of Current. Column widths adjust based on whether the metric has a target (7 or 8 columns).
+The numeric Current value sits to the right of Start so the two reference numbers are adjacent, and the chart sits to the right of Current. All four metrics now have targets, so the table is always 8 columns (the `hasTarget` branch is retained in code for safety).
 
 **Inline bar charts** (in student table) — 12px tall, rounded. Layers:
 1. Track: light gray background spanning the full bar
@@ -166,7 +168,7 @@ The numeric Current value sits to the right of Start so the two reference number
 
 **Mastery row treatment** — when a student is mastered on the currently-viewed metric, the row collapses the numeric and chart columns into a single italic "Mastered at initial assessment" cell. Student name and teacher columns remain. Mastered rows always group together at the bottom of the table regardless of which column is sorted, so working students (the ones who still need progress monitoring) cluster at the top where attention should go.
 
-**Legend** — small colored squares for On track/Below target, a line for EOY target, and the slash pattern swatch for Projected growth. Only target-related items show when viewing a metric with a target.
+**Legend** — small colored squares for On track/Below target, a line for EOY target, and the slash pattern swatch for Projected growth. All four metrics have targets, so every item shows on every metric.
 
 **Data-freshness footer** — a subtle centered note at the bottom of the page, separated by a light top rule: "Data updates at the top of every hour (last updated [time]). Refresh the page to see new data." The time is computed client-side to the top of the current hour. (In the prototype the data is static; this conveys the production update cadence and reminds users the page does not auto-refresh.)
 
@@ -176,12 +178,15 @@ Tabler Icons webfont (outline style only). Used for: back arrow (`ti-arrow-left`
 
 ### Responsive behavior
 
+Below 900px viewport width:
+- The aggregate chart grid on district and school cards drops from three across to two across.
+
 Below 767px viewport width:
 - The chart column in the student-level table is hidden so the row only carries the numeric fields. The Current column is right-aligned to compensate.
 
 Below 640px viewport width:
 - Summary metric cards stack into a single column (instead of the 3-column grid).
-- The per-grade/per-metric grid on district and school cards also stacks into a single column so the bars and triplets stay readable.
+- The aggregate chart grid on district and school cards drops to a single column so the charts stay readable.
 - Metric toggle buttons in the grade view become a `<select>` dropdown. Both elements are always rendered; CSS shows one or the other based on viewport.
 - The student table wraps in a horizontal-scroll container with a 640px minimum width. The first column (Student) is sticky so the name stays visible while the rest of the row scrolls.
 - Body padding tightens from 2rem to 1rem to claim more usable width.
@@ -192,18 +197,18 @@ Below 640px viewport width:
 - Clicking a grade card navigates to that grade's student table
 - Back button navigates up one level
 - Metric toggle buttons switch which metric the student table displays (re-renders the full grade view)
-- Column headers are sortable (click to sort, click again to reverse). Sort state resets to name ascending when switching metrics or navigating.
-- No filtering. No dropdown selectors.
+- Column headers are sortable (click to sort, click again to reverse). Sort state resets to name ascending when switching metrics or navigating. Mastered students always group at the bottom regardless of sort column.
+- No filtering. The metric toggle is the only selector; it renders as pill buttons on desktop and a `<select>` dropdown below 640px.
 
 ## Key design decisions
 
 1. **Binary status only.** On track or below target. No yellow/approaching state. Simpler for administrators to act on.
 2. **Status based on projected EOY, not current score.** A student could have a low current score but strong growth trajectory and still be "on track." This rewards growth.
 3. **Consistent status coloring.** Bar, slash pattern, and projected dot all use the same color per student. No mixed signals.
-4. **2-column metric grid on cards.** Third metric wraps to a new row at the same width rather than cramming 3 across.
-5. **No filter dropdown on grade view.** The metric toggle buttons are sufficient. Keeps the interface simple.
+4. **Three aggregate charts per card.** District and school cards show months of growth, WCPM, and HFW side by side (3-across desktop, 2-across tablet, 1-across mobile), each aggregating real scores across all students in scope.
+5. **WCPM is the metric of truth.** Every grade exposes the same four metrics with WCPM as the default and the headline; PA and LNF are supplementary.
 6. **Teacher column in student table.** Students from multiple classes can appear in one grade view, so the teacher name disambiguates.
-7. **Emerging metrics available but clearly secondary.** Toggle buttons show all metrics, but the note and missing target columns make it clear these are supplementary.
+7. **Mastery instead of emerging metrics.** All four metrics have targets. Students who began at or above a target are "mastered" and shown as a single row rather than a score, which is how PA and LNF read for most 1st and 2nd graders.
 8. **Demo data is seeded.** Same data every page load. Change a school's seed in `SCFG` to get different students.
 
 ## File structure
@@ -214,18 +219,17 @@ A separate `school-dashboard.html` exists from an earlier iteration (single-scho
 
 ## Getting started
 
-1. Create a new GitHub repo (e.g., `student-progress-dashboard`) under the Ignite Reading org or Chris's personal account.
-2. Add `index.html` and this spec to the repo root.
-3. The prototype is a single self-contained HTML file. Open it directly in a browser to see the current state. No build step required.
+The prototype lives at [github.com/chris-geiser/student-progress-dashboard](https://github.com/chris-geiser/student-progress-dashboard) and is deployed via GitHub Pages at [chris-geiser.github.io/student-progress-dashboard](https://chris-geiser.github.io/student-progress-dashboard/). It is a single self-contained HTML file (`index.html`); open it directly in a browser or visit the Pages URL. No build step required.
 
 ## What's next (not yet built)
 
 These are potential next steps, not commitments. Discuss with Chris before implementing.
 
 - Convert from static HTML prototype to a production framework (React, etc.)
-- Connect to real student data via API
+- Connect to real student data via API; the months-of-growth formula and data lineage are owned by the data team
+- Restyle to the Ignite brand system
+- Replace the placeholder week-over-week trend with a real time-series source
+- Wire the "Fill Seats" CTA to its destination
 - Add time period selector (view progress at different points in the year)
 - Add export/print functionality
-- Add responsive design for tablet/mobile
-- Consider whether school-level and grade-level views need different summary metrics
-- Accessibility audit (keyboard navigation, screen reader support, ARIA labels)
+- Accessibility audit (keyboard navigation, screen reader support, ARIA labels, non-color status cues)
