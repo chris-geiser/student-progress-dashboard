@@ -1,0 +1,8 @@
+# Local-only handoff docs (kept on disk, not published to GitHub)
+PRD.md
+DESIGN-BRIEF.md
+student-progress-metrics.xlsx
+
+# Local dev / OS artifacts
+.claude/
+.DS_Store
