@@ -168,7 +168,7 @@ The numeric Current value sits to the right of Start so the two reference number
 
 **Legend** — small colored squares for On track/Below target, a line for EOY target, and the slash pattern swatch for Projected growth. Only target-related items show when viewing a metric with a target.
 
-**Data-freshness footer** — a subtle centered note at the bottom of the page, separated by a light top rule: "Data updates at the top of every hour. Last updated [time]." The time is computed client-side to the top of the current hour. (In the prototype the data is static; this conveys the production update cadence.)
+**Data-freshness footer** — a subtle centered note at the bottom of the page, separated by a light top rule: "Data updates at the top of every hour (last updated [time]). Refresh the page to see new data." The time is computed client-side to the top of the current hour. (In the prototype the data is static; this conveys the production update cadence and reminds users the page does not auto-refresh.)
 
 ### Icons
 

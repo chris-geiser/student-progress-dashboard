@@ -618,7 +618,7 @@ else renderGrade(st.si,st.gk);
 render();
 
 // Data-freshness note: data refreshes at the top of every hour.
-(function(){var n=new Date();n.setMinutes(0,0,0);var t=n.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});var f=document.getElementById('app-footer');if(f)f.textContent='Data updates at the top of every hour. Last updated '+t+'.';})();
+(function(){var n=new Date();n.setMinutes(0,0,0);var t=n.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});var f=document.getElementById('app-footer');if(f)f.textContent='Data updates at the top of every hour (last updated '+t+'). Refresh the page to see new data.';})();
 </script>
 </body>
 </html>
