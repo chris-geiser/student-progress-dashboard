@@ -114,7 +114,7 @@ System font stack. Two weights for the body of the design system: 400 (regular) 
 ### Components
 
 **Growth statement callout** — sits between the sub-counts bar and the metric cards on every view. Sits in a secondary-background block with generous padding. A single personalized sentence rendered at 18px in primary text. Key growth figures inside the sentence (months of progress, per-metric deltas) sit inline at the same 18px size in weight 700, wrapped in a white pill with a 0.5px tertiary border and small horizontal padding — a quieter "highlight" treatment that emphasizes the numbers without changing the text size or introducing additional color. (Weight 700 is a deliberate exception to the "no 600/700 weight" rule in the Typography section.) The personalized sentence adapts to the scope:
-- District and school views: aggregated across 1st and 2nd graders only, citing words correct per minute and high-frequency words.
+- District and school views: aggregated across all students (K, 1st, 2nd), citing words correct per minute and high-frequency words.
 - Grade view (K): scoped to kindergartners, citing phonological awareness (letter sounds) and letter naming fluency.
 - Grade view (1st / 2nd): scoped to that grade, same metrics as the district sentence.
 
